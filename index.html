@@ -166,18 +166,23 @@ function fbm(x, y) { // fractal noise for organic structure
 // A single light→dark density ramp. Digits and symbols live on the SAME
 // ramp ordered by visual weight, so the art never looks like "two styles".
 // Two leading spaces give a little breathing room; everything else fills.
-const RAMP = " .·:;-~=+iocsxz2358O0Q%#@".split("");
+// Digits only, ordered light → heavy by how much ink each glyph carries.
+// One leading space keeps a little breathing room; everything else is a number.
+const RAMP = " 1742356908".split("");
 const RLAST = RAMP.length - 1;
 
 /* ---------- 5. Movements ----------
    Not different styles — different *motions* of the same dense field.
    They share the ramp above; only the flow/warp/contrast params change,
    so the character language stays consistent the whole time. */
+// Same FLOW for every movement + similar scales => the motion speed stays
+// constant the whole time; movements differ only in pattern, never in speed.
+const FLOW = [0.045, 0.030, 0.028];
 const MOVEMENTS = [
-  { name: "drift",  scale: 0.052, warp: 2.4, gamma: 1.05, lobe: 0.42, flow: [ 0.05,  0.03,  0.02] },
-  { name: "weave",  scale: 0.078, warp: 1.7, gamma: 0.85, lobe: 0.30, flow: [ 0.03, -0.02,  0.04] },
-  { name: "ripple", scale: 0.034, warp: 3.4, gamma: 1.30, lobe: 0.55, flow: [ 0.02,  0.04, -0.03] },
-  { name: "swirl",  scale: 0.060, warp: 2.9, gamma: 1.10, lobe: 0.38, flow: [-0.04,  0.05,  0.03] },
+  { name: "drift",  scale: 0.052, warp: 2.4, gamma: 1.05, lobe: 0.42, flow: FLOW },
+  { name: "weave",  scale: 0.060, warp: 1.8, gamma: 0.92, lobe: 0.32, flow: FLOW },
+  { name: "ripple", scale: 0.046, warp: 3.2, gamma: 1.22, lobe: 0.50, flow: FLOW },
+  { name: "swirl",  scale: 0.056, warp: 2.9, gamma: 1.05, lobe: 0.38, flow: FLOW },
 ];
 const FBM_NORM = 1 / 0.875; // normalize 3-octave fbm back to ~0..1
 
@@ -196,10 +201,10 @@ function field(fx, fy, t, P) {
   const lobe = fbm(fx * 0.013 + t * 0.008, fy * 0.013 + 9.1) * FBM_NORM;
   let v = w * 0.6 + ridg * 0.4;
   v = v * (1 - P.lobe) + lobe * P.lobe;
-  // strong S-curve contrast -> clear forms instead of flat haze
-  v = (v - 0.5) * 1.9 + 0.5;
+  // contrast + brighten so the heavier digits (8 0 9 6) actually appear
+  v = (v - 0.5) * 2.1 + 0.5;
   v = v < 0 ? 0 : v > 1 ? 1 : v;
-  return Math.pow(v, P.gamma);
+  return Math.pow(v, 0.72 * P.gamma);
 }
 
 // Smoothly blend two movement param sets (used while morphing between them).
@@ -267,7 +272,7 @@ function frame(now) {
       const v = field(c, r, t, P);
       const ch = RAMP[(v * RLAST) | 0];
       if (ch === " ") continue;                 // sparse breathing space only
-      const alpha = 0.16 + 0.84 * v;            // dense, high-contrast depth
+      const alpha = 0.34 + 0.66 * v;            // keep even light digits watchable
       const rgb = v > 0.82 ? accStr : inkStr;   // brightest cells pick up accent
       ctx.fillStyle = `rgba(${rgb},${alpha.toFixed(3)})`;
       ctx.fillText(ch, c * cell, yPx);
