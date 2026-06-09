@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>ASCII — Generative</title>
+<style>
+  :root {
+    /* active palette is injected by JS as CSS vars too, for UI chrome */
+    --bg: #1d3fd1;
+    --fg: #f4f1e8;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    background: var(--bg);
+    color: var(--fg);
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    overflow: hidden;
+    -webkit-text-size-adjust: 100%;
+  }
+  /* canvas fills the viewport on every device, safe-area aware */
+  #art {
+    display: block;
+    position: fixed;
+    inset: 0;
+    width: 100vw;
+    height: 100vh;
+    height: 100dvh; /* correct on mobile browsers w/ dynamic toolbars */
+    touch-action: manipulation;
+  }
+  /* minimal floating controls */
+  .hud {
+    position: fixed;
+    left: max(16px, env(safe-area-inset-left));
+    bottom: max(16px, env(safe-area-inset-bottom));
+    z-index: 10;
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    align-items: center;
+    user-select: none;
+  }
+  .hud button {
+    font: inherit;
+    font-size: 13px;
+    letter-spacing: 0.04em;
+    color: var(--fg);
+    background: color-mix(in srgb, var(--bg) 70%, #000 10%);
+    border: 1px solid color-mix(in srgb, var(--fg) 35%, transparent);
+    border-radius: 999px;
+    padding: 7px 13px;
+    cursor: pointer;
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    transition: transform .12s ease, background .2s ease, opacity .2s ease;
+  }
+  .hud button:hover { transform: translateY(-1px); }
+  .hud button:active { transform: translateY(0); opacity: .8; }
+  .hud .label {
+    font-size: 12px;
+    opacity: .65;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  /* swatches */
+  .swatches { display: flex; gap: 6px; }
+  .swatch {
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    border: 1px solid rgba(255,255,255,.4);
+    cursor: pointer;
+    padding: 0;
+    transition: transform .12s ease;
+  }
+  .swatch:hover { transform: scale(1.12); }
+  .swatch[aria-pressed="true"] { outline: 2px solid var(--fg); outline-offset: 2px; }
+  @media (max-width: 480px) {
+    .hud .mode-name { display: none; }
+  }
+</style>
+</head>
+<body>
+  <canvas id="art" aria-label="Generative ASCII artwork"></canvas>
+
+  <div class="hud">
+    <button id="pause" title="Play / pause animation">⏸ Pause</button>
+    <button id="next" title="Jump to next style">Style →</button>
+    <span class="mode-name label" id="modeName">flow</span>
+    <span class="label">·</span>
+    <div class="swatches" id="swatches"></div>
+    <button id="autocolor" title="Auto-cycle colors" aria-pressed="false">Auto-color: off</button>
+  </div>
+
+<script>
+/* =====================================================================
+   Generative ASCII artwork
+   - Responsive: rebuilds character grid for any viewport, retina-sharp
+   - Morphs through styles: flow → density → stitch → contour → ...
+   - Palette system with a startable color-change function (starts blue)
+   ===================================================================== */
+
+/* ---------- 1. Palettes (blue first, per your 3rd reference image) ---------- */
+const PALETTES = {
+  cobalt:   { name: "cobalt",   bg: "#1d3fd1", ink: "#f4f1e8", accent: "#9fb4ff" },
+  blueprint:{ name: "blueprint",bg: "#0a1f6e", ink: "#cfe0ff", accent: "#5b8cff" },
+  ink:      { name: "ink",      bg: "#f4f1e8", ink: "#16357a", accent: "#3a63d0" }, // cream w/ blue ink (like ref #2)
+  ember:    { name: "ember",    bg: "#160d0a", ink: "#ff7a3c", accent: "#ffd0a0" },
+  mono:     { name: "mono",     bg: "#0c0c0c", ink: "#e9e9e9", accent: "#888888" },
+  jade:     { name: "jade",     bg: "#062b22", ink: "#a9f0d1", accent: "#3fbf8f" },
+};
+const PALETTE_ORDER = ["cobalt", "blueprint", "ink", "jade", "ember", "mono"];
+let palette = PALETTES.cobalt;
+
+/* ---------- 2. Canvas setup ---------- */
+const canvas = document.getElementById("art");
+const ctx = canvas.getContext("2d", { alpha: false });
+let W = 0, H = 0, DPR = 1;
+let cols = 0, rows = 0, cell = 14;
+
+function resize() {
+  DPR = Math.min(window.devicePixelRatio || 1, 2); // cap for perf on retina
+  W = window.innerWidth;
+  H = window.innerHeight;
+  canvas.width = Math.floor(W * DPR);
+  canvas.height = Math.floor(H * DPR);
+  canvas.style.width = W + "px";
+  canvas.style.height = H + "px";
+  ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+
+  // cell size scales with screen — denser art on big screens, readable on phones
+  const minSide = Math.min(W, H);
+  cell = Math.max(9, Math.min(18, Math.round(minSide / 46)));
+  cols = Math.ceil(W / cell) + 1;
+  rows = Math.ceil(H / cell) + 1;
+
+  ctx.font = `${cell + 1}px ui-monospace, Menlo, Consolas, monospace`;
+  ctx.textBaseline = "top";
+}
+window.addEventListener("resize", resize, { passive: true });
+window.addEventListener("orientationchange", resize, { passive: true });
+
+/* ---------- 3. Lightweight value-noise (no deps) ---------- */
+// Hash-based smooth noise, good enough for flow fields & density.
+function hash(x, y) {
+  let h = x * 374761393 + y * 668265263;
+  h = (h ^ (h >> 13)) * 1274126177;
+  return ((h ^ (h >> 16)) >>> 0) / 4294967295;
+}
+function smooth(t) { return t * t * (3 - 2 * t); }
+function noise2(x, y) {
+  const xi = Math.floor(x), yi = Math.floor(y);
+  const xf = x - xi, yf = y - yi;
+  const a = hash(xi, yi),     b = hash(xi + 1, yi);
+  const c = hash(xi, yi + 1), d = hash(xi + 1, yi + 1);
+  const u = smooth(xf), v = smooth(yf);
+  return (a * (1 - u) + b * u) * (1 - v) + (c * (1 - u) + d * u) * v;
+}
+function fbm(x, y) { // fractal noise for organic structure
+  let v = 0, amp = 0.5, freq = 1;
+  for (let i = 0; i < 4; i++) { v += amp * noise2(x * freq, y * freq); freq *= 2; amp *= 0.5; }
+  return v;
+}
+
+/* ---------- 4. Character ramps per style ---------- */
+const RAMP_DENSITY = " .:-=+*#%@".split("");          // light → dark
+const FLOW_CHARS    = ["-", "\\", "|", "/", "-", "\\", "|", "/"]; // by angle
+const STITCH_CHARS  = ["·", "x", "X", "▢", "■"];
+const CONTOUR_CHARS = ["0", "o", "O", "9", "8", "()"];
+
+/* ---------- 5. Styles ---------- */
+// Each style returns {char, alpha} for a grid cell given field values.
+const STYLES = [
+  {
+    name: "flow",
+    draw(fx, fy, t) {
+      // angle from a slowly rotating flow field -> directional glyph
+      const a = fbm(fx * 0.12 + t * 0.05, fy * 0.12) * Math.PI * 4;
+      const idx = (Math.round((a % (Math.PI * 2)) / (Math.PI / 4)) + 8) % 8;
+      const energy = fbm(fx * 0.08 - t * 0.03, fy * 0.08 + 5);
+      return { char: FLOW_CHARS[idx], alpha: 0.25 + energy * 0.75 };
+    },
+  },
+  {
+    name: "density",
+    draw(fx, fy, t) {
+      // animated portrait-like density field (halftone ramp, ref #1)
+      let v = fbm(fx * 0.06 + t * 0.04, fy * 0.06 - t * 0.02);
+      v += 0.35 * fbm(fx * 0.2, fy * 0.2 + t * 0.08);
+      v = Math.min(1, Math.max(0, v));
+      const ch = RAMP_DENSITY[Math.floor(v * (RAMP_DENSITY.length - 1))];
+      return { char: ch, alpha: 0.15 + v * 0.85 };
+    },
+  },
+  {
+    name: "stitch",
+    draw(fx, fy, t) {
+      // cross-stitch grid — subject emerges above a threshold (ref #3)
+      const v = fbm(fx * 0.07 - t * 0.02, fy * 0.07 + t * 0.03);
+      if (v < 0.46) return { char: "", alpha: 0 };
+      const ch = STITCH_CHARS[Math.min(STITCH_CHARS.length - 1, Math.floor((v - 0.46) * 9))];
+      return { char: ch, alpha: 0.4 + v * 0.6 };
+    },
+  },
+  {
+    name: "contour",
+    draw(fx, fy, t) {
+      // topographic contour rings of 0/o/O (ref #2)
+      const v = fbm(fx * 0.05 + t * 0.02, fy * 0.05 - t * 0.02) * 9;
+      const band = Math.abs(v - Math.round(v)); // distance to a contour line
+      if (band > 0.32) return { char: "", alpha: 0 };
+      const ch = CONTOUR_CHARS[Math.floor((1 - band / 0.32) * (CONTOUR_CHARS.length - 1))];
+      return { char: ch, alpha: 0.3 + (1 - band / 0.32) * 0.7 };
+    },
+  },
+];
+
+/* ---------- 6. Animation loop with smooth style morphing ---------- */
+let styleIndex = 0;
+let nextStyleIndex = 0;
+let morph = 1;            // 1 = fully on current style
+const STYLE_HOLD = 9000;  // ms each style holds before auto-advancing
+let lastSwitch = 0;
+let t = 0;                // virtual time (advances only while playing)
+let playing = true;
+let lastFrame = 0;
+
+function hexToRgb(h) {
+  const n = parseInt(h.slice(1), 16);
+  return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+}
+
+function advanceStyle() {
+  styleIndex = nextStyleIndex;
+  nextStyleIndex = (styleIndex + 1) % STYLES.length;
+  morph = 0;
+  document.getElementById("modeName").textContent = STYLES[nextStyleIndex].name;
+}
+
+function frame(now) {
+  requestAnimationFrame(frame);
+  const dt = Math.min(50, now - lastFrame || 16);
+  lastFrame = now;
+
+  if (playing) {
+    t += dt * 0.001 * 12; // animation speed
+    if (now - lastSwitch > STYLE_HOLD) { lastSwitch = now; advanceStyle(); }
+  }
+  if (morph < 1) morph = Math.min(1, morph + dt / 1200); // ease style crossfade
+
+  // background
+  ctx.fillStyle = palette.bg;
+  ctx.fillRect(0, 0, W, H);
+
+  const inkRGB = hexToRgb(palette.ink);
+  const accRGB = hexToRgb(palette.accent);
+  const cur = STYLES[styleIndex];
+  const nxt = STYLES[nextStyleIndex];
+
+  for (let r = 0; r < rows; r++) {
+    const fy = r;
+    for (let c = 0; c < cols; c++) {
+      const fx = c;
+      const A = cur.draw(fx, fy, t);
+      let char = A.char, alpha = A.alpha * (1 - (morph < 1 ? morph : 0));
+      if (morph < 1) {
+        const B = nxt.draw(fx, fy, t);
+        // blend: fade out old, fade in new
+        if (B.alpha * morph > alpha) { char = B.char; alpha = B.alpha * morph; }
+      }
+      if (!char || alpha < 0.06) continue;
+
+      // accent the densest cells for a touch of depth
+      const useAccent = alpha > 0.82;
+      const rgb = useAccent ? accRGB : inkRGB;
+      ctx.fillStyle = `rgba(${rgb[0]},${rgb[1]},${rgb[2]},${Math.min(1, alpha).toFixed(3)})`;
+      ctx.fillText(char, c * cell, r * cell);
+    }
+  }
+}
+
+/* ---------- 7. Palette / color-change function ---------- */
+function setPalette(nameOrPalette) {
+  palette = typeof nameOrPalette === "string" ? (PALETTES[nameOrPalette] || palette) : nameOrPalette;
+  document.documentElement.style.setProperty("--bg", palette.bg);
+  document.documentElement.style.setProperty("--fg", palette.ink);
+  // reflect pressed state on swatches
+  document.querySelectorAll(".swatch").forEach(s =>
+    s.setAttribute("aria-pressed", String(s.dataset.pal === palette.name)));
+}
+
+// Auto color-cycling (the "color changing function" — starts OFF on blue)
+let autoColor = false;
+let colorTimer = null;
+function startColorCycle(intervalMs = 7000) {
+  stopColorCycle();
+  autoColor = true;
+  let i = PALETTE_ORDER.indexOf(palette.name);
+  colorTimer = setInterval(() => {
+    i = (i + 1) % PALETTE_ORDER.length;
+    setPalette(PALETTE_ORDER[i]);
+  }, intervalMs);
+}
+function stopColorCycle() { autoColor = false; if (colorTimer) clearInterval(colorTimer); colorTimer = null; }
+
+/* ---------- 8. HUD wiring ---------- */
+function buildSwatches() {
+  const wrap = document.getElementById("swatches");
+  wrap.innerHTML = "";
+  PALETTE_ORDER.forEach(key => {
+    const p = PALETTES[key];
+    const b = document.createElement("button");
+    b.className = "swatch";
+    b.dataset.pal = key;
+    b.title = key;
+    b.style.background = p.bg;
+    b.style.boxShadow = `inset 0 0 0 6px ${p.ink}22`;
+    b.setAttribute("aria-pressed", String(key === palette.name));
+    b.addEventListener("click", () => { stopColorCycle(); updateAutoBtn(); setPalette(key); });
+    wrap.appendChild(b);
+  });
+}
+function updateAutoBtn() {
+  const btn = document.getElementById("autocolor");
+  btn.textContent = "Auto-color: " + (autoColor ? "on" : "off");
+  btn.setAttribute("aria-pressed", String(autoColor));
+}
+
+document.getElementById("pause").addEventListener("click", (e) => {
+  playing = !playing;
+  e.target.textContent = playing ? "⏸ Pause" : "▶ Play";
+});
+document.getElementById("next").addEventListener("click", () => {
+  lastSwitch = performance.now();
+  advanceStyle();
+});
+document.getElementById("autocolor").addEventListener("click", () => {
+  if (autoColor) stopColorCycle(); else startColorCycle();
+  updateAutoBtn();
+});
+
+// double-tap / double-click the art to advance style (nice on touch devices)
+canvas.addEventListener("dblclick", () => { lastSwitch = performance.now(); advanceStyle(); });
+
+/* ---------- 9. Boot ---------- */
+resize();
+setPalette("cobalt");   // start on the blue you liked
+buildSwatches();
+updateAutoBtn();
+lastSwitch = performance.now();
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>
