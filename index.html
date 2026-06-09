@@ -86,7 +86,7 @@
   <div class="hud">
     <button id="pause" title="Play / pause animation">⏸ Pause</button>
     <button id="next" title="Jump to next style">Style →</button>
-    <span class="mode-name label" id="modeName">flow</span>
+    <span class="mode-name label" id="modeName">drift</span>
     <span class="label">·</span>
     <div class="swatches" id="swatches"></div>
     <button id="autocolor" title="Auto-cycle colors" aria-pressed="false">Auto-color: off</button>
@@ -128,9 +128,9 @@ function resize() {
   canvas.style.height = H + "px";
   ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
 
-  // cell size scales with screen — denser art on big screens, readable on phones
+  // cell size scales with screen — dense fill on every device
   const minSide = Math.min(W, H);
-  cell = Math.max(9, Math.min(18, Math.round(minSide / 46)));
+  cell = Math.max(7, Math.min(13, Math.round(minSide / 64)));
   cols = Math.ceil(W / cell) + 1;
   rows = Math.ceil(H / cell) + 1;
 
@@ -158,68 +158,66 @@ function noise2(x, y) {
 }
 function fbm(x, y) { // fractal noise for organic structure
   let v = 0, amp = 0.5, freq = 1;
-  for (let i = 0; i < 4; i++) { v += amp * noise2(x * freq, y * freq); freq *= 2; amp *= 0.5; }
+  for (let i = 0; i < 3; i++) { v += amp * noise2(x * freq, y * freq); freq *= 2; amp *= 0.5; }
   return v;
 }
 
-/* ---------- 4. Character ramps per style ---------- */
-const RAMP_DENSITY = " .:-=+*#%@".split("");          // light → dark
-const FLOW_CHARS    = ["-", "\\", "|", "/", "-", "\\", "|", "/"]; // by angle
-const STITCH_CHARS  = ["·", "x", "X", "▢", "■"];
-const CONTOUR_CHARS = ["0", "o", "O", "9", "8", "()"];
+/* ---------- 4. ONE unified character ramp ---------- */
+// A single light→dark density ramp. Digits and symbols live on the SAME
+// ramp ordered by visual weight, so the art never looks like "two styles".
+// Two leading spaces give a little breathing room; everything else fills.
+const RAMP = " .·:;-~=+iocsxz2358O0Q%#@".split("");
+const RLAST = RAMP.length - 1;
 
-/* ---------- 5. Styles ---------- */
-// Each style returns {char, alpha} for a grid cell given field values.
-const STYLES = [
-  {
-    name: "flow",
-    draw(fx, fy, t) {
-      // angle from a slowly rotating flow field -> directional glyph
-      const a = fbm(fx * 0.12 + t * 0.05, fy * 0.12) * Math.PI * 4;
-      const idx = (Math.round((a % (Math.PI * 2)) / (Math.PI / 4)) + 8) % 8;
-      const energy = fbm(fx * 0.08 - t * 0.03, fy * 0.08 + 5);
-      return { char: FLOW_CHARS[idx], alpha: 0.25 + energy * 0.75 };
-    },
-  },
-  {
-    name: "density",
-    draw(fx, fy, t) {
-      // animated portrait-like density field (halftone ramp, ref #1)
-      let v = fbm(fx * 0.06 + t * 0.04, fy * 0.06 - t * 0.02);
-      v += 0.35 * fbm(fx * 0.2, fy * 0.2 + t * 0.08);
-      v = Math.min(1, Math.max(0, v));
-      const ch = RAMP_DENSITY[Math.floor(v * (RAMP_DENSITY.length - 1))];
-      return { char: ch, alpha: 0.15 + v * 0.85 };
-    },
-  },
-  {
-    name: "stitch",
-    draw(fx, fy, t) {
-      // cross-stitch grid — subject emerges above a threshold (ref #3)
-      const v = fbm(fx * 0.07 - t * 0.02, fy * 0.07 + t * 0.03);
-      if (v < 0.46) return { char: "", alpha: 0 };
-      const ch = STITCH_CHARS[Math.min(STITCH_CHARS.length - 1, Math.floor((v - 0.46) * 9))];
-      return { char: ch, alpha: 0.4 + v * 0.6 };
-    },
-  },
-  {
-    name: "contour",
-    draw(fx, fy, t) {
-      // topographic contour rings of 0/o/O (ref #2)
-      const v = fbm(fx * 0.05 + t * 0.02, fy * 0.05 - t * 0.02) * 9;
-      const band = Math.abs(v - Math.round(v)); // distance to a contour line
-      if (band > 0.32) return { char: "", alpha: 0 };
-      const ch = CONTOUR_CHARS[Math.floor((1 - band / 0.32) * (CONTOUR_CHARS.length - 1))];
-      return { char: ch, alpha: 0.3 + (1 - band / 0.32) * 0.7 };
-    },
-  },
+/* ---------- 5. Movements ----------
+   Not different styles — different *motions* of the same dense field.
+   They share the ramp above; only the flow/warp/contrast params change,
+   so the character language stays consistent the whole time. */
+const MOVEMENTS = [
+  { name: "drift",  scale: 0.052, warp: 2.4, gamma: 1.05, lobe: 0.42, flow: [ 0.05,  0.03,  0.02] },
+  { name: "weave",  scale: 0.078, warp: 1.7, gamma: 0.85, lobe: 0.30, flow: [ 0.03, -0.02,  0.04] },
+  { name: "ripple", scale: 0.034, warp: 3.4, gamma: 1.30, lobe: 0.55, flow: [ 0.02,  0.04, -0.03] },
+  { name: "swirl",  scale: 0.060, warp: 2.9, gamma: 1.10, lobe: 0.38, flow: [-0.04,  0.05,  0.03] },
 ];
+const FBM_NORM = 1 / 0.875; // normalize 3-octave fbm back to ~0..1
 
-/* ---------- 6. Animation loop with smooth style morphing ---------- */
-let styleIndex = 0;
-let nextStyleIndex = 0;
-let morph = 1;            // 1 = fully on current style
-const STYLE_HOLD = 9000;  // ms each style holds before auto-advancing
+// Domain-warped density field — the source of the organic, flowing look.
+function field(fx, fy, t, P) {
+  const s = P.scale, fa = P.flow;
+  // two-stage domain warp -> organic, flowing structure
+  const q1 = fbm(fx * s + t * fa[0], fy * s);
+  const q2 = fbm(fx * s + 5.2, fy * s + t * fa[1] + 1.3);
+  const nx = fx * s + P.warp * (q1 - 0.45);
+  const ny = fy * s + P.warp * (q2 - 0.45) + t * fa[2];
+  const w = fbm(nx, ny) * FBM_NORM;                              // base mass 0..1
+  // ridged higher-freq layer -> flowing "vein" lines like the contour refs
+  const ridg = 1 - Math.abs(fbm(nx * 2.3 + 11.0, ny * 2.3) * FBM_NORM * 2 - 1);
+  // slow large lobe -> big light/dark masses drift through (a subject emerging)
+  const lobe = fbm(fx * 0.013 + t * 0.008, fy * 0.013 + 9.1) * FBM_NORM;
+  let v = w * 0.6 + ridg * 0.4;
+  v = v * (1 - P.lobe) + lobe * P.lobe;
+  // strong S-curve contrast -> clear forms instead of flat haze
+  v = (v - 0.5) * 1.9 + 0.5;
+  v = v < 0 ? 0 : v > 1 ? 1 : v;
+  return Math.pow(v, P.gamma);
+}
+
+// Smoothly blend two movement param sets (used while morphing between them).
+function lerpMove(A, B, k) {
+  const L = (a, b) => a + (b - a) * k;
+  return {
+    name: k < 0.5 ? A.name : B.name,
+    scale: L(A.scale, B.scale), warp: L(A.warp, B.warp),
+    gamma: L(A.gamma, B.gamma), lobe: L(A.lobe, B.lobe),
+    flow: [L(A.flow[0], B.flow[0]), L(A.flow[1], B.flow[1]), L(A.flow[2], B.flow[2])],
+  };
+}
+
+/* ---------- 6. Animation loop (dense, single-ramp render) ---------- */
+let mvIndex = 0;          // current movement
+let mvNext = 0;           // movement we're easing toward
+let mvK = 1;              // 0..1 blend between current and next movement
+const MOVE_HOLD = 11000;  // ms each movement holds before auto-advancing
 let lastSwitch = 0;
 let t = 0;                // virtual time (advances only while playing)
 let playing = true;
@@ -229,12 +227,13 @@ function hexToRgb(h) {
   const n = parseInt(h.slice(1), 16);
   return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
 }
+const easeInOut = (k) => k * k * (3 - 2 * k);
 
 function advanceStyle() {
-  styleIndex = nextStyleIndex;
-  nextStyleIndex = (styleIndex + 1) % STYLES.length;
-  morph = 0;
-  document.getElementById("modeName").textContent = STYLES[nextStyleIndex].name;
+  mvIndex = mvNext;
+  mvNext = (mvIndex + 1) % MOVEMENTS.length;
+  mvK = 0;
+  document.getElementById("modeName").textContent = MOVEMENTS[mvNext].name;
 }
 
 function frame(now) {
@@ -243,10 +242,15 @@ function frame(now) {
   lastFrame = now;
 
   if (playing) {
-    t += dt * 0.001 * 12; // animation speed
-    if (now - lastSwitch > STYLE_HOLD) { lastSwitch = now; advanceStyle(); }
+    t += dt * 0.001 * 9; // animation speed
+    if (now - lastSwitch > MOVE_HOLD) { lastSwitch = now; advanceStyle(); }
   }
-  if (morph < 1) morph = Math.min(1, morph + dt / 1200); // ease style crossfade
+  if (mvK < 1) mvK = Math.min(1, mvK + dt / 2200); // slow ease between movements
+
+  // active (blended) movement params — one field, one ramp, fully unified
+  const P = mvK >= 1
+    ? MOVEMENTS[mvIndex]
+    : lerpMove(MOVEMENTS[mvIndex], MOVEMENTS[mvNext], easeInOut(mvK));
 
   // background
   ctx.fillStyle = palette.bg;
@@ -254,27 +258,19 @@ function frame(now) {
 
   const inkRGB = hexToRgb(palette.ink);
   const accRGB = hexToRgb(palette.accent);
-  const cur = STYLES[styleIndex];
-  const nxt = STYLES[nextStyleIndex];
+  const inkStr = inkRGB.join(",");
+  const accStr = accRGB.join(",");
 
   for (let r = 0; r < rows; r++) {
-    const fy = r;
+    const yPx = r * cell;
     for (let c = 0; c < cols; c++) {
-      const fx = c;
-      const A = cur.draw(fx, fy, t);
-      let char = A.char, alpha = A.alpha * (1 - (morph < 1 ? morph : 0));
-      if (morph < 1) {
-        const B = nxt.draw(fx, fy, t);
-        // blend: fade out old, fade in new
-        if (B.alpha * morph > alpha) { char = B.char; alpha = B.alpha * morph; }
-      }
-      if (!char || alpha < 0.06) continue;
-
-      // accent the densest cells for a touch of depth
-      const useAccent = alpha > 0.82;
-      const rgb = useAccent ? accRGB : inkRGB;
-      ctx.fillStyle = `rgba(${rgb[0]},${rgb[1]},${rgb[2]},${Math.min(1, alpha).toFixed(3)})`;
-      ctx.fillText(char, c * cell, r * cell);
+      const v = field(c, r, t, P);
+      const ch = RAMP[(v * RLAST) | 0];
+      if (ch === " ") continue;                 // sparse breathing space only
+      const alpha = 0.16 + 0.84 * v;            // dense, high-contrast depth
+      const rgb = v > 0.82 ? accStr : inkStr;   // brightest cells pick up accent
+      ctx.fillStyle = `rgba(${rgb},${alpha.toFixed(3)})`;
+      ctx.fillText(ch, c * cell, yPx);
     }
   }
 }
