@@ -34,7 +34,7 @@
     </div>
   </div>
 
-  <!-- About content (filled in from the ABOUT data block in the script below) -->
+  <!-- About content (filled in from content/about.txt — edit that file) -->
   <main class="page">
     <div class="page-inner">
       <p class="kicker">About</p>
@@ -71,77 +71,51 @@
   <script src="assets/app.js"></script>
 
   <!-- =====================================================================
-       ▼▼▼  EDIT YOUR DETAILS HERE  ▼▼▼
-       Everything on the About page comes from this one object.
-       To change something, just edit the text inside the quotes.
-       To add an item, copy a { ... } line and change its text.
-       To remove an item, delete its { ... } line.
-       (Keep the quotes and commas as they are.)
+       This page builds itself from the plain-text file:  content/about.txt
+       To change any detail, open that text file (or double-click
+       "1-Edit-content.command"), edit the words, then publish.
+       You do NOT need to touch the code below.
        ===================================================================== -->
   <script>
-  const ABOUT = {
-    name: "Janet Cheng",
-    fullName: "Cheng Yu Tung",
-    role: "Multimedia designer & creative technologist",
-    location: "Hong Kong",
+  // Turn the plain-text file into structured data.
+  function parseAbout(text) {
+    const out = { name: "", role: "", location: "", intro: [], education: [], experience: [], tools: [], languages: [], awards: [] };
+    let section = "";
+    text.split(/\r?\n/).forEach((raw) => {
+      const line = raw.trim();
+      if (!line || line.startsWith("#")) return;            // blank or comment
+      const sec = line.match(/^\[(.+?)\]/);
+      if (sec) { section = sec[1].trim().toUpperCase(); return; }
+      const kv = line.match(/^(NAME|ROLE|LOCATION)\s*=\s*(.*)$/i);
+      if (kv) { out[kv[1].toLowerCase()] = kv[2].trim(); return; }
+      const isItem = line.startsWith("- ");
+      const body = isItem ? line.slice(2).trim() : line;
+      const f = body.split(/\s*\|\s*/);                     // "a | b | c" -> [a,b,c]
+      switch (section) {
+        case "INTRO": out.intro.push(body); break;
+        case "EDUCATION": out.education.push({ program: f[0] || "", school: f[1] || "", dates: f[2] || "" }); break;
+        case "EXPERIENCE": out.experience.push({ role: f[0] || "", org: f[1] || "", dates: f[2] || "", note: f[3] || "" }); break;
+        case "TOOLS": (isItem ? [body] : body.split(",")).forEach((t) => { const v = t.trim(); if (v) out.tools.push(v); }); break;
+        case "LANGUAGES": (isItem ? [body] : body.split(",")).forEach((t) => { const v = t.trim(); if (v) out.languages.push(v); }); break;
+        case "AWARDS": out.awards.push({ title: f[0] || "", year: f[1] || "", note: f[2] || "", link: f[3] || "" }); break;
+      }
+    });
+    return out;
+  }
 
-    // Short intro paragraphs (each "..." is one paragraph).
-    intro: [
-      "I'm finishing my MSc in Innovative Multimedia Entertainment at The Hong Kong Polytechnic University, where I also earned my BA (Hons) in Communication Design.",
-      "I work across coding, AI content creation, game development and motion design — pairing a strong visual-design foundation with hands-on technical skills. I love prototyping ideas and building things together with a team.",
-    ],
-
-    // Education — newest first.
-    education: [
-      { program: "MSc Innovative Multimedia Entertainment", school: "The Hong Kong Polytechnic University", dates: "Aug 2025 — May 2026" },
-      { program: "BA (Hons) Communication Design",          school: "The Hong Kong Polytechnic University", dates: "Aug 2021 — May 2025" },
-      { program: "IELTS — Overall band 7.5",                school: "",                                     dates: "" },
-    ],
-
-    // Work experience — newest first.
-    experience: [
-      { role: "Intern, School of Design",     org: "Research Laboratory for Advanced Social Robotics, PolyU", dates: "Dec 2025 — Jan 2026", note: "Built Python text-to-speech / speech-to-text audio pipelines with API integrations." },
-      { role: "Temporary Library Assistant",  org: "Hong Kong Metropolitan University",                       dates: "Jul 2025 — Aug 2025", note: "Counter duties, arranging books and packing new arrivals." },
-      { role: "Design Intern",                org: "Wowwowtank Co. Limited",                                  dates: "Jun 2024 — Aug 2024", note: "Created commercial designs for various housing-estate projects." },
-      { role: "Temporary Clerk",              org: "Hong Kong Buildings Department",                          dates: "Jul 2023 — Aug 2023", note: "General clerical and computer-related duties." },
-    ],
-
-    // Software / tools you use.
-    tools: ["Photoshop", "Illustrator", "InDesign", "Premiere Pro", "After Effects", "Blender", "TouchDesigner", "Unreal", "Unity", "Python (VS Code)", "Affinity", "Canva", "CapCut"],
-
-    // Languages.
-    languages: ["Cantonese (native)", "English", "Mandarin"],
-
-    // Awards & competitions — newest first. Leave "link" as "" if there's no link.
-    awards: [
-      { title: "HKFAA Poster Design Competition", year: "2024", note: "2nd runner-up — 42nd HK Film Awards Student Poster Design Competition.", link: "" },
-      { title: "Graphis New Talent Awards",       year: "2024", note: "Honorable Mention.", link: "https://www.graphis.com/entry/b035f481-5c1c-443b-9acf-49d831145a6c/" },
-      { title: "IDA — International Design Awards", year: "2023", note: "Silver in Print / Posters — collaborated with Korean university students.", link: "https://www.idesignawards.com/inners-old/zoom.php?cid=9-48599-23" },
-      { title: "D&AD New Blood Awards",           year: "2023", note: "Took part in the D&AD New Blood brief; pitched the concept with Blender-made visuals.", link: "" },
-    ],
-  };
-  /* ▲▲▲  END OF EDITABLE DETAILS — you don't need to touch anything below.  ▲▲▲ */
-
-  (function renderAbout() {
-    const el = (tag, cls, text) => {
-      const e = document.createElement(tag);
-      if (cls) e.className = cls;
-      if (text != null) e.textContent = text;
-      return e;
-    };
+  function renderAbout(ABOUT) {
+    const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
     const byId = (id) => document.getElementById(id);
 
-    byId("ab-name").textContent = ABOUT.name;
+    byId("ab-name").textContent = ABOUT.name || "JCYT";
     byId("ab-tag").textContent = [ABOUT.role, ABOUT.location].filter(Boolean).join("  ·  ");
 
-    const intro = byId("ab-intro");
+    const intro = byId("ab-intro"); intro.innerHTML = "";
     (ABOUT.intro || []).forEach((p) => intro.appendChild(el("p", null, p)));
 
-    // Education
-    const edu = byId("ab-edu");
+    const edu = byId("ab-edu"); edu.innerHTML = "";
     (ABOUT.education || []).forEach((it) => {
-      const li = el("li", "ab-item");
-      const top = el("div", "top");
+      const li = el("li", "ab-item"), top = el("div", "top");
       top.appendChild(el("span", "title", it.program));
       if (it.dates) top.appendChild(el("span", "when", it.dates));
       li.appendChild(top);
@@ -149,11 +123,9 @@
       edu.appendChild(li);
     });
 
-    // Experience
-    const exp = byId("ab-exp");
+    const exp = byId("ab-exp"); exp.innerHTML = "";
     (ABOUT.experience || []).forEach((it) => {
-      const li = el("li", "ab-item");
-      const top = el("div", "top");
+      const li = el("li", "ab-item"), top = el("div", "top");
       top.appendChild(el("span", "title", it.role));
       if (it.dates) top.appendChild(el("span", "when", it.dates));
       li.appendChild(top);
@@ -162,8 +134,7 @@
       exp.appendChild(li);
     });
 
-    // Skills
-    const skills = byId("ab-skills");
+    const skills = byId("ab-skills"); skills.innerHTML = "";
     const tools = el("div", "tags");
     (ABOUT.tools || []).forEach((t) => tools.appendChild(el("span", "tag", t)));
     skills.appendChild(tools);
@@ -174,25 +145,35 @@
       skills.appendChild(langs);
     }
 
-    // Awards
-    const aw = byId("ab-awards");
+    const aw = byId("ab-awards"); aw.innerHTML = "";
     (ABOUT.awards || []).forEach((it) => {
-      const li = el("li", "ab-item");
-      const top = el("div", "top");
+      const li = el("li", "ab-item"), top = el("div", "top");
       top.appendChild(el("span", "title", it.title));
       if (it.year) top.appendChild(el("span", "when", it.year));
       li.appendChild(top);
       if (it.note) li.appendChild(el("div", "note", it.note));
       if (it.link) {
-        const wrap = el("div", "note");
-        const a = el("a", "award-link", "View ↗");
+        const wrap = el("div", "note"), a = el("a", "award-link", "View ↗");
         a.href = it.link; a.target = "_blank"; a.rel = "noopener";
-        wrap.appendChild(a);
-        li.appendChild(wrap);
+        wrap.appendChild(a); li.appendChild(wrap);
       }
       aw.appendChild(li);
     });
-  })();
+  }
+
+  // Load the text file and build the page. (Works on the live site and via the
+  // "Preview locally" command. If opened straight from disk it can't read the
+  // file, so we show a gentle hint.)
+  fetch("content/about.txt", { cache: "no-store" })
+    .then((r) => { if (!r.ok) throw new Error("not found"); return r.text(); })
+    .then((t) => renderAbout(parseAbout(t)))
+    .catch(() => renderAbout({
+      name: "JCYT",
+      role: "About",
+      intro: ["This page loads its content from content/about.txt.",
+              "Open it through the live site or the “Preview locally” command to see it."],
+      education: [], experience: [], tools: [], languages: [], awards: [],
+    }));
   </script>
 </body>
 </html>

@@ -1,0 +1,49 @@
+# ============================================================
+#  JCYT — ABOUT PAGE CONTENT
+#  Edit the words below, then double-click "3-Publish-to-website.command".
+#
+#  HOW IT WORKS
+#  - Lines that start with #  are notes. They are ignored.
+#  - [SECTION]  starts a section. Don't rename the sections.
+#  - For lists, each entry is one line that starts with "- ".
+#  - Inside a list entry, fields are separated by  |  (a bar).
+#  - To ADD an entry: copy a "- " line and change the words.
+#  - To REMOVE an entry: delete its "- " line.
+#  - Keep the bars | in place, even if a field is empty.
+# ============================================================
+
+NAME = Janet Cheng
+ROLE = Multimedia designer & creative technologist
+LOCATION = Hong Kong
+
+# Short intro. Each line here becomes one paragraph.
+[INTRO]
+I'm finishing my MSc in Innovative Multimedia Entertainment at The Hong Kong Polytechnic University, where I also earned my BA (Hons) in Communication Design.
+I work across coding, AI content creation, game development and motion design — pairing a strong visual-design foundation with hands-on technical skills. I love prototyping ideas and building things together with a team.
+
+# Format:   - program | school | dates
+[EDUCATION]
+- MSc Innovative Multimedia Entertainment | The Hong Kong Polytechnic University | Aug 2025 — May 2026
+- BA (Hons) Communication Design | The Hong Kong Polytechnic University | Aug 2021 — May 2025
+- IELTS — Overall band 7.5 | |
+
+# Format:   - role | organisation | dates | what you did
+[EXPERIENCE]
+- Intern, School of Design | Research Laboratory for Advanced Social Robotics, PolyU | Dec 2025 — Jan 2026 | Built Python text-to-speech / speech-to-text audio pipelines with API integrations.
+- Temporary Library Assistant | Hong Kong Metropolitan University | Jul 2025 — Aug 2025 | Counter duties, arranging books and packing new arrivals.
+- Design Intern | Wowwowtank Co. Limited | Jun 2024 — Aug 2024 | Created commercial designs for various housing-estate projects.
+- Temporary Clerk | Hong Kong Buildings Department | Jul 2023 — Aug 2023 | General clerical and computer-related duties.
+
+# Software / tools. Separate with commas (or put one per "- " line).
+[TOOLS]
+Photoshop, Illustrator, InDesign, Premiere Pro, After Effects, Blender, TouchDesigner, Unreal, Unity, Python (VS Code), Affinity, Canva, CapCut
+
+[LANGUAGES]
+Cantonese (native), English, Mandarin
+
+# Format:   - title | year | note | link   (leave link empty if none)
+[AWARDS]
+- HKFAA Poster Design Competition | 2024 | 2nd runner-up — 42nd HK Film Awards Student Poster Design Competition. |
+- Graphis New Talent Awards | 2024 | Honorable Mention. | https://www.graphis.com/entry/b035f481-5c1c-443b-9acf-49d831145a6c/
+- IDA — International Design Awards | 2023 | Silver in Print / Posters — collaborated with Korean university students. | https://www.idesignawards.com/inners-old/zoom.php?cid=9-48599-23
+- D&AD New Blood Awards | 2023 | Took part in the D&AD New Blood brief; pitched the concept with Blender-made visuals. |
