@@ -1,0 +1,145 @@
+============================================================
+ JCYT PORTFOLIO — HOW TO EDIT YOUR WEBSITE
+ (a simple guide — no coding needed)
+============================================================
+
+THE BIG IDEA
+------------
+Your whole website reads its words and pictures from a few plain
+text files inside the "content" folder. You change the text files,
+then click one button to publish. That's it.
+
+  - Your site lives at:
+      https://janetcheng0311.github.io/JCYT2.0/
+  - All your editable files live in this folder:
+      /Users/janet/Downloads/portfolio/
+
+You only ever edit things in two places:
+  1. content/about.txt   → the About page
+  2. content/work.txt    → the Work page (your projects)
+  3. assets/work/         → your project images live here
+
+
+THE 3 BUTTONS (double-click to use)
+-----------------------------------
+  1-Edit-content.command       Opens your text files in TextEdit.
+  2-Preview-locally.command    Shows the site on THIS computer only,
+                               so you can check before publishing.
+                               (Close the black window to stop it.)
+  3-Publish-to-website.command Puts your changes online. Needs internet
+                               + your GitHub login. ~1 minute to go live.
+
+FIRST TIME: when you double-click a .command, the Mac may ask
+"are you sure?" — click Open. After that it just runs.
+
+
+THE NORMAL ROUTINE
+------------------
+  1. Double-click  1-Edit-content   → change the words → Save (Cmd+S).
+  2. (optional) Double-click  2-Preview-locally  → check it looks right.
+  3. Double-click  3-Publish-to-website  → done. Wait ~1 minute, then
+     refresh your site (hold Shift while clicking refresh).
+
+
+RULES THAT KEEP THE FILES WORKING
+---------------------------------
+  - Lines that start with  #   are NOTES. The website ignores them.
+  - Keep the SECTION names in [SQUARE BRACKETS] exactly as they are.
+  - Keep the bars  |  between fields, even when a field is empty.
+  - Keep the quotes/commas where you see them.
+  - When unsure, copy an existing line and change the words inside.
+
+
+------------------------------------------------------------
+ EDITING THE ABOUT PAGE  (content/about.txt)
+------------------------------------------------------------
+Top of the file (one value each):
+  NAME      = the BIG name on the page         (e.g. Janet)
+  FULLNAME  = the small name under it          (e.g. Cheng Yu Tung)
+  ROLE      = your one-line role
+  LOCATION  = where you are
+
+[INTRO]
+  Each line here becomes one paragraph.
+
+[EDUCATION]      format:   - program | school | dates
+  Each "- " line is one entry. Leave a field empty if not needed,
+  but keep the | bars, e.g.:   - IELTS 7.5 | |
+
+[EXPERIENCE]     format:   - role | organisation | dates | what you did
+
+[TOOLS]          your software, separated by commas.
+[LANGUAGES]      your languages, separated by commas.
+
+[AWARDS]         format:   - title | year | note | link
+  Leave the link empty if there isn't one. If you add a link, a
+  small "View" button appears so people can open the award page.
+
+TO ADD an entry: copy a "- " line, paste it below, change the words.
+TO REMOVE an entry: delete its "- " line.
+
+
+------------------------------------------------------------
+ EDITING THE WORK PAGE  (content/work.txt)
+------------------------------------------------------------
+Each project is ONE block that starts with  [PROJECT]  and has:
+
+  ID       = short name used in the web address (letters/dashes only),
+             e.g.  grafri   →  project page becomes  project.html?p=grafri
+  TITLE    = the project name (English or Chinese is fine)
+  YEAR     = a year number, e.g. 2024
+             (this is what the YEAR RULER on the side uses, and it
+              sorts the page newest-first automatically)
+  CATEGORY = a short label, e.g.  Poster design
+  DESC     = one short sentence
+  LINK     = optional web link (leave empty if none)
+  COVER    = the image shown in the Work LIST.
+             Leave empty to use the first image in IMAGES.
+  IMAGES   = all the project's pictures, separated by commas.
+
+TO ADD a project: copy a whole [PROJECT] block (from [PROJECT] down to
+  its IMAGES line), paste it, and change the words. Give it a new ID.
+TO REMOVE a project: delete its whole [PROJECT] block.
+
+
+------------------------------------------------------------
+ ADDING PICTURES TO A PROJECT
+------------------------------------------------------------
+  1. Put your image files into the folder:
+        assets/work/
+     (You can also make a sub-folder per project, e.g.
+        assets/work/chiikawa/ )
+
+  2. In content/work.txt, write the file names on the IMAGES line,
+     separated by commas. You do NOT write "assets/work/" — just the
+     names. Examples:
+
+        IMAGES = hkfaa-eternal-moment.jpg
+        IMAGES = chiikawa.jpg, chiikawa/detail-1.jpg, chiikawa/detail-2.jpg
+
+  3. (optional) Set COVER to pick which picture shows in the list:
+        COVER = chiikawa/detail-1.jpg
+
+  4. Publish (button 3).
+
+GOOD TO KNOW
+  - Clicking a project on the Work page opens its OWN page that shows
+    every image in IMAGES, at its real size.
+  - Pictures look best saved around 1200-1600px wide. Huge files make
+    the page slow.
+  - Supported types: .jpg  .jpeg  .png
+
+
+------------------------------------------------------------
+ IF SOMETHING LOOKS WRONG
+------------------------------------------------------------
+  - Don't see your change? Hold SHIFT and click the browser refresh
+    button (this clears the old cached version).
+  - A picture is blank/broken? Check the file name in work.txt matches
+    the real file name in assets/work/ EXACTLY (capital letters and the
+    .jpg / .png ending must match).
+  - Publish failed? Check your internet, then double-click button 3
+    again.
+  - You can always Preview locally (button 2) before publishing.
+
+That's everything. Edit words → Preview → Publish. Have fun!
