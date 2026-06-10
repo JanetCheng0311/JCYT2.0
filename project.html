@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>Project — JCYT</title>
+<link rel="stylesheet" href="assets/style.css?v=5" />
+</head>
+<body class="page-view">
+  <canvas id="art" aria-hidden="true"></canvas>
+  <div class="veil"></div>
+
+  <!-- Top bar: logo + menu -->
+  <header class="topbar">
+    <a class="logo" href="./" aria-label="JCYT — home">JCYT<span class="dot">.</span></a>
+    <button id="menuBtn" class="menu-btn" aria-label="Open menu" aria-expanded="false" aria-controls="overlay">
+      <span class="ln"></span><span class="ln"></span><span class="ln"></span>
+    </button>
+  </header>
+
+  <!-- Full-screen menu -->
+  <div id="overlay" class="overlay" role="dialog" aria-modal="true" aria-label="Site menu">
+    <nav>
+      <a href="./"><span class="idx">01</span>Home</a>
+      <a href="work.html" class="current"><span class="idx">02</span>Work</a>
+      <a href="about.html"><span class="idx">03</span>About</a>
+      <a href="contact.html"><span class="idx">04</span>Contact</a>
+    </nav>
+    <div class="foot">
+      <a class="mail" href="mailto:janetcheng0311@gmail.com">janetcheng0311@gmail.com</a>
+      <a href="https://github.com/JanetCheng0311?tab=repositories" target="_blank" rel="noopener">GitHub</a>
+      <a href="https://www.instagram.com/jcyt.prj" target="_blank" rel="noopener">Instagram</a>
+      <span class="year">© 2026 JCYT</span>
+    </div>
+  </div>
+
+  <main class="page project">
+    <div class="page-inner">
+      <a class="proj-back" href="work.html">← All work</a>
+      <div class="proj-head">
+        <div class="proj-metaline" id="pr-meta"></div>
+        <h1 class="proj-title" id="pr-title"></h1>
+        <p class="proj-desc" id="pr-desc"></p>
+        <a class="proj-link" id="pr-link" target="_blank" rel="noopener" style="display:none"></a>
+      </div>
+      <div class="proj-gallery" id="pr-gallery"></div>
+    </div>
+  </main>
+
+  <script src="assets/app.js"></script>
+  <script>
+  // same plain-text source as the Work page
+  function parseWork(text) {
+    const projects = [];
+    let cur = null;
+    const push = () => { if (cur && (cur.title || cur.year)) projects.push(cur); };
+    text.split(/\r?\n/).forEach((raw) => {
+      const line = raw.trim();
+      if (!line || line.startsWith("#")) return;
+      if (/^\[PROJECT\]/i.test(line)) { push(); cur = { id: "", title: "", year: "", category: "", desc: "", link: "", cover: "", images: [] }; return; }
+      if (!cur) cur = { id: "", title: "", year: "", category: "", desc: "", link: "", cover: "", images: [] };
+      const kv = line.match(/^([A-Z]+)\s*=\s*(.*)$/i);
+      if (!kv) return;
+      const key = kv[1].toUpperCase(), val = kv[2].trim();
+      if (key === "ID") cur.id = val;
+      else if (key === "TITLE") cur.title = val;
+      else if (key === "YEAR") cur.year = val;
+      else if (key === "CATEGORY") cur.category = val;
+      else if (key === "DESC") cur.desc = val;
+      else if (key === "LINK") cur.link = val;
+      else if (key === "COVER") cur.cover = val;
+      else if (key === "IMAGES") cur.images = val ? val.split(",").map((s) => s.trim()).filter(Boolean) : [];
+    });
+    push();
+    return projects;
+  }
+  function asset(n) { return !n ? n : (/^(https?:|\/|assets\/)/i.test(n) ? n : "assets/work/" + n); }
+
+  const params = new URLSearchParams(location.search);
+  const want = params.get("p");
+
+  function render(p) {
+    document.title = (p.title || "Project") + " — JCYT";
+    const meta = [p.category, p.year].filter(Boolean);
+    const mEl = document.getElementById("pr-meta");
+    meta.forEach((m) => { const s = document.createElement("span"); s.textContent = m; mEl.appendChild(s); });
+    document.getElementById("pr-title").textContent = p.title || "Untitled";
+    document.getElementById("pr-desc").textContent = p.desc || "";
+    if (p.link) {
+      const a = document.getElementById("pr-link");
+      a.href = p.link; a.textContent = "Visit ↗"; a.style.display = "";
+    }
+    const g = document.getElementById("pr-gallery");
+    if (p.images && p.images.length) {
+      p.images.forEach((src, i) => {
+        const img = document.createElement("img");
+        img.src = asset(src); img.alt = (p.title || "") + " — image " + (i + 1);
+        img.loading = i < 2 ? "eager" : "lazy";
+        g.appendChild(img);
+      });
+    } else {
+      const e = document.createElement("p");
+      e.className = "proj-empty";
+      e.textContent = "No images yet — add file names to this project's IMAGES line in content/work.txt.";
+      g.appendChild(e);
+    }
+  }
+
+  fetch("content/work.txt", { cache: "no-store" })
+    .then((r) => { if (!r.ok) throw new Error("not found"); return r.text(); })
+    .then((t) => {
+      const projects = parseWork(t);
+      projects.forEach((p, i) => { if (!p.id) p.id = "p" + i; });
+      const p = projects.find((x) => x.id === want) || projects[0];
+      if (p) render(p);
+      else document.getElementById("pr-title").textContent = "Project not found";
+    })
+    .catch(() => {
+      document.getElementById("pr-title").textContent = "Open via the live site or “Preview locally”.";
+    });
+  </script>
+</body>
+</html>

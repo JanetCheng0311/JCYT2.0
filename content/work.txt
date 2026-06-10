@@ -4,35 +4,39 @@
 #
 #  HOW IT WORKS
 #  - Each project is one [PROJECT] block.
+#  - Clicking a project on the Work page opens its own PROJECT PAGE,
+#    which shows every image listed in IMAGES (at their real size).
 #  - To ADD a project: copy a whole [PROJECT] block and change the words.
 #  - To REMOVE a project: delete its whole [PROJECT] block.
-#  - The page sorts projects by YEAR automatically (newest first) and the
-#    year ruler on the side follows your scroll.
 #
 #  FIELDS
+#  ID       = short name used in the web address (letters/numbers/dashes)
 #  TITLE    = the project name
-#  YEAR     = a year number, e.g. 2024  (drives the year ruler + sorting)
+#  YEAR     = a year number (drives the year ruler + sorting)
 #  CATEGORY = a short label, e.g. Poster design
 #  DESC     = one short sentence about it
 #  LINK     = an optional web link (leave empty if none)
-#  COVER    = optional small thumbnail (leave empty to show a letter tile)
-#  IMAGES   = the gallery images, comma-separated. All images live in
-#             assets/work/  — just write their file names here.
+#  COVER    = the image shown in the Work list (leave empty = first IMAGE)
+#  IMAGES   = all the project's images, comma-separated. They live in
+#             assets/work/  — just write the file names (sub-folders ok, e.g.
+#             grafri/01.jpg).
 #
 #  >>> Lines marked  "# CHECK"  are images I could not match for sure.
-#      Please rename/move them or fix the title & year, then publish.
+#      Please fix the title/year or rename them, then publish.
 # ============================================================
 
 [PROJECT]
+ID = grafri
 TITLE = GRAFRI 筆跡研究所
 YEAR = 2025
 CATEGORY = Capstone · Branding
-DESC = Promoting Chinese graphology in Hong Kong — identity and introduction video.
+DESC = Promoting Chinese graphology in Hong Kong — identity, system and introduction video.
 LINK =
-COVER =
-IMAGES = grafri-logo.png, grafri-intro.jpg
+COVER = grafri/06.jpg
+IMAGES = grafri/01.jpg, grafri/02.jpg, grafri/03.jpg, grafri/04.jpg, grafri/05.jpg, grafri/06.jpg, grafri/07.jpg, grafri/08.jpg, grafri/09.jpg, grafri/10.jpg, grafri/11.jpg, grafri/12.jpg, grafri/13.jpg, grafri/14.jpg, grafri/15.jpg, grafri/16.jpg, grafri/17.jpg, grafri/18.jpg, grafri/19.jpg, grafri/20.jpg, grafri/21.jpg, grafri/22.jpg, grafri/23.jpg, grafri/24.jpg, grafri/25.jpg, grafri/26.jpg, grafri/27.jpg, grafri/28.jpg, grafri/29.jpg, grafri/30.jpg, grafri/31.jpg, grafri/32.jpg, grafri/33.jpg, grafri/34.jpg, grafri/35.jpg, grafri/36.jpg, grafri/37.jpg, grafri/38.jpg, grafri/39.jpg, grafri/40.jpg
 
 [PROJECT]
+ID = eternal-moment
 TITLE = 永恆一刻 (Eternal Moment)
 YEAR = 2024
 CATEGORY = Poster design
@@ -42,6 +46,7 @@ COVER =
 IMAGES = hkfaa-eternal-moment.jpg
 
 [PROJECT]
+ID = chiikawa
 TITLE = 如何畫一隻自己的吉伊卡哇 (Draw your own Chiikawa)
 YEAR = 2024
 CATEGORY = School project · Illustration
@@ -52,6 +57,7 @@ IMAGES = chiikawa.jpg
 
 # CHECK — 3D render of a cube speaker. Right title? Right year?
 [PROJECT]
+ID = cube-speaker
 TITLE = Cube Speaker (3D)
 YEAR = 2024
 CATEGORY = 3D / Product
@@ -62,6 +68,7 @@ IMAGES = cube-speaker-3d.jpg
 
 # CHECK — 3D render reading "YOUR PLANET". Right title? Right year?
 [PROJECT]
+ID = your-planet
 TITLE = Your Planet (3D)
 YEAR = 2024
 CATEGORY = 3D render
@@ -72,6 +79,7 @@ IMAGES = your-planet-3d.jpg
 
 # CHECK — iridescent crystal letterforms. Right title? Right year?
 [PROJECT]
+ID = crystal-type
 TITLE = Crystal Typography
 YEAR = 2024
 CATEGORY = Typography
@@ -81,6 +89,7 @@ COVER =
 IMAGES = crystal-type.jpg
 
 [PROJECT]
+ID = our-hour
 TITLE = 24/7 — Our Hour
 YEAR = 2023
 CATEGORY = Poster / Print
@@ -90,6 +99,7 @@ COVER =
 IMAGES = our-hour-a.jpg, our-hour-b.jpg
 
 [PROJECT]
+ID = math-soup
 TITLE = Math Soup (Campbell's × Duolingo)
 YEAR = 2023
 CATEGORY = Brand concept · D&AD
@@ -100,6 +110,7 @@ IMAGES = campbells-maths-soup.jpg
 
 # CHECK — flat blue geometric design with cutlery/buildings. Right title? Right year?
 [PROJECT]
+ID = geometric
 TITLE = Geometric Identity Study
 YEAR = 2023
 CATEGORY = Branding
@@ -110,6 +121,7 @@ IMAGES = blue-geometric.jpg
 
 # CHECK — halftone "23" typographic study. Right title? Right year?
 [PROJECT]
+ID = type-23
 TITLE = Type 23
 YEAR = 2023
 CATEGORY = Typography
@@ -119,6 +131,7 @@ COVER =
 IMAGES = type-23.png
 
 [PROJECT]
+ID = long-ear-monster
 TITLE = Long Ear Monster
 YEAR = 2022
 CATEGORY = Character / Toy design
@@ -128,6 +141,7 @@ COVER =
 IMAGES = long-ear-monster.jpg
 
 [PROJECT]
+ID = safe-cyberworld
 TITLE = 全城攜守網安在手 (Safe Cyberworld)
 YEAR = 2021
 CATEGORY = Tram body design

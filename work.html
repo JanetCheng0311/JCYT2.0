@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 <title>Work — JCYT</title>
-<link rel="stylesheet" href="assets/style.css?v=4" />
+<link rel="stylesheet" href="assets/style.css?v=5" />
 </head>
 <body class="page-view">
   <canvas id="art" aria-hidden="true"></canvas>
@@ -78,12 +78,13 @@
     text.split(/\r?\n/).forEach((raw) => {
       const line = raw.trim();
       if (!line || line.startsWith("#")) return;
-      if (/^\[PROJECT\]/i.test(line)) { push(); cur = { title: "", year: "", category: "", desc: "", link: "", cover: "", images: [] }; return; }
-      if (!cur) cur = { title: "", year: "", category: "", desc: "", link: "", cover: "", images: [] };
+      if (/^\[PROJECT\]/i.test(line)) { push(); cur = { id: "", title: "", year: "", category: "", desc: "", link: "", cover: "", images: [] }; return; }
+      if (!cur) cur = { id: "", title: "", year: "", category: "", desc: "", link: "", cover: "", images: [] };
       const kv = line.match(/^([A-Z]+)\s*=\s*(.*)$/i);
       if (!kv) return;
       const key = kv[1].toUpperCase(), val = kv[2].trim();
-      if (key === "TITLE") cur.title = val;
+      if (key === "ID") cur.id = val;
+      else if (key === "TITLE") cur.title = val;
       else if (key === "YEAR") cur.year = val;
       else if (key === "CATEGORY") cur.category = val;
       else if (key === "DESC") cur.desc = val;
@@ -213,6 +214,7 @@
           im.src = asset(cover); im.alt = p.title || ""; im.loading = "lazy";
           thumb.appendChild(im);
         } else {
+          thumb.classList.add("is-letter");
           thumb.textContent = (p.title || "?").trim().charAt(0).toUpperCase();
         }
 
@@ -226,7 +228,8 @@
         const arrow = document.createElement("span"); arrow.className = "w-arrow"; arrow.textContent = "↗";
 
         row.appendChild(thumb); row.appendChild(main); row.appendChild(arrow);
-        row.addEventListener("click", () => openGallery(p));
+        const pid = p.id || ("p" + p._i);
+        row.addEventListener("click", () => { location.href = "project.html?p=" + encodeURIComponent(pid); });
         li.appendChild(row);
         ul.appendChild(li);
       });
