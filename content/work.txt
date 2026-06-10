@@ -5,7 +5,7 @@
 #  HOW IT WORKS
 #  - Each project is one [PROJECT] block.
 #  - Clicking a project on the Work page opens its own PROJECT PAGE,
-#    which shows every image listed in IMAGES (at their real size).
+#    which shows every image listed in IMAGES (at its real size).
 #  - To ADD a project: copy a whole [PROJECT] block and change the words.
 #  - To REMOVE a project: delete its whole [PROJECT] block.
 #
@@ -18,11 +18,10 @@
 #  LINK     = an optional web link (leave empty if none)
 #  COVER    = the image shown in the Work list (leave empty = first IMAGE)
 #  IMAGES   = all the project's images, comma-separated. They live in
-#             assets/work/  — just write the file names (sub-folders ok, e.g.
-#             grafri/01.jpg).
+#             assets/work/  (each project has its own sub-folder).
 #
-#  >>> Lines marked  "# CHECK"  are images I could not match for sure.
-#      Please fix the title/year or rename them, then publish.
+#  >>> Lines marked  "# CHECK"  are projects whose title/year I'm unsure of.
+#      Please fix them, then publish.
 # ============================================================
 
 [PROJECT]
@@ -42,8 +41,8 @@ YEAR = 2024
 CATEGORY = Poster design
 DESC = 2nd runner-up — 42nd HK Film Awards Student Poster Design Competition.
 LINK =
-COVER =
-IMAGES = hkfaa-eternal-moment.jpg
+COVER = eternal-moment/01.jpg
+IMAGES = eternal-moment/01.jpg, eternal-moment/02.jpg, eternal-moment/03.jpg, eternal-moment/04.jpg, eternal-moment/05.jpg
 
 [PROJECT]
 ID = chiikawa
@@ -52,8 +51,8 @@ YEAR = 2024
 CATEGORY = School project · Illustration
 DESC = An illustrated how-to guide.
 LINK =
-COVER =
-IMAGES = chiikawa.jpg
+COVER = chiikawa/01.jpg
+IMAGES = chiikawa/01.jpg, chiikawa/02.jpg, chiikawa/03.jpg, chiikawa/04.jpg
 
 # CHECK — 3D render of a cube speaker. Right title? Right year?
 [PROJECT]
@@ -63,8 +62,8 @@ YEAR = 2024
 CATEGORY = 3D / Product
 DESC = 3D modelling and rendering study.
 LINK =
-COVER =
-IMAGES = cube-speaker-3d.jpg
+COVER = cube-speaker/01.jpg
+IMAGES = cube-speaker/01.jpg, cube-speaker/02.jpg, cube-speaker/03.jpg
 
 # CHECK — 3D render reading "YOUR PLANET". Right title? Right year?
 [PROJECT]
@@ -74,8 +73,8 @@ YEAR = 2024
 CATEGORY = 3D render
 DESC = 3D concept render.
 LINK =
-COVER =
-IMAGES = your-planet-3d.jpg
+COVER = your-planet/01.jpg
+IMAGES = your-planet/01.jpg, your-planet/02.jpg, your-planet/03.jpg, your-planet/04.jpg
 
 # CHECK — iridescent crystal letterforms. Right title? Right year?
 [PROJECT]
@@ -85,8 +84,8 @@ YEAR = 2024
 CATEGORY = Typography
 DESC = Experimental crystal lettering.
 LINK =
-COVER =
-IMAGES = crystal-type.jpg
+COVER = crystal-type/01.jpg
+IMAGES = crystal-type/01.jpg, crystal-type/02.jpg, crystal-type/03.jpg, crystal-type/04.jpg
 
 [PROJECT]
 ID = our-hour
@@ -95,8 +94,8 @@ YEAR = 2023
 CATEGORY = Poster / Print
 DESC = Silver, IDA New Graphic Design Award (with Korean university students); Honorable Mention, Graphis New Talent.
 LINK = https://graphis.com/entry/b038f481-5c1e-443b-9acf-49d831145a6c
-COVER =
-IMAGES = our-hour-a.jpg, our-hour-b.jpg
+COVER = our-hour/01.jpg
+IMAGES = our-hour/01.jpg, our-hour/02.jpg, our-hour/03.jpg, our-hour/04.jpg, our-hour/05.jpg, our-hour/06.jpg
 
 [PROJECT]
 ID = math-soup
@@ -105,8 +104,8 @@ YEAR = 2023
 CATEGORY = Brand concept · D&AD
 DESC = 2023 D&AD New Blood entry — a playful Campbell's × Duolingo crossover.
 LINK =
-COVER =
-IMAGES = campbells-maths-soup.jpg
+COVER = math-soup/01.jpg
+IMAGES = math-soup/01.jpg, math-soup/02.jpg, math-soup/03.jpg, math-soup/04.jpg, math-soup/05.jpg
 
 # CHECK — flat blue geometric design with cutlery/buildings. Right title? Right year?
 [PROJECT]
@@ -116,8 +115,8 @@ YEAR = 2023
 CATEGORY = Branding
 DESC = Geometric visual-identity exploration.
 LINK =
-COVER =
-IMAGES = blue-geometric.jpg
+COVER = geometric/01.jpg
+IMAGES = geometric/01.jpg, geometric/02.jpg, geometric/03.jpg
 
 # CHECK — halftone "23" typographic study. Right title? Right year?
 [PROJECT]
@@ -127,8 +126,8 @@ YEAR = 2023
 CATEGORY = Typography
 DESC = Typographic experiment.
 LINK =
-COVER =
-IMAGES = type-23.png
+COVER = type-23/01.jpg
+IMAGES = type-23/01.jpg, type-23/02.jpg, type-23/03.jpg
 
 [PROJECT]
 ID = long-ear-monster
@@ -137,8 +136,8 @@ YEAR = 2022
 CATEGORY = Character / Toy design
 DESC = Character design and a handmade comfort soft toy.
 LINK =
-COVER =
-IMAGES = long-ear-monster.jpg
+COVER = long-ear-monster/01.jpg
+IMAGES = long-ear-monster/01.jpg
 
 [PROJECT]
 ID = safe-cyberworld
@@ -147,5 +146,5 @@ YEAR = 2021
 CATEGORY = Tram body design
 DESC = "Together, We Create a Safe Cyberworld" — tram body design competition.
 LINK =
-COVER =
-IMAGES = safe-cyberworld-tram.jpg
+COVER = safe-cyberworld/01.jpg
+IMAGES = safe-cyberworld/01.jpg, safe-cyberworld/02.jpg, safe-cyberworld/03.jpg, safe-cyberworld/04.jpg
