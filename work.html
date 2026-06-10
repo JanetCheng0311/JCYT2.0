@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 <title>Work — JCYT</title>
-<link rel="stylesheet" href="assets/style.css" />
+<link rel="stylesheet" href="assets/style.css?v=4" />
 </head>
 <body class="page-view">
   <canvas id="art" aria-hidden="true"></canvas>
@@ -95,6 +95,12 @@
     return projects;
   }
 
+  // image file names in work.txt are relative to assets/work/ — resolve them
+  function asset(n) {
+    if (!n) return n;
+    return /^(https?:|\/|assets\/)/i.test(n) ? n : "assets/work/" + n;
+  }
+
   // ---- gallery state ----
   const gallery = document.getElementById("gallery");
   const galSlot = document.getElementById("gal-slot");
@@ -107,7 +113,7 @@
     galSlot.innerHTML = "";
     if (src) {
       const img = document.createElement("img");
-      img.src = src; img.alt = galName + " — image " + (galIndex + 1);
+      img.src = asset(src); img.alt = galName + " — image " + (galIndex + 1);
       galSlot.appendChild(img);
     } else {
       const ph = document.createElement("div");
@@ -199,10 +205,16 @@
         const row = document.createElement("button");
         row.className = "work-row"; row.type = "button";
 
+        const cover = p.cover || (p.images && p.images[0]) || "";
         const thumb = document.createElement("span");
         thumb.className = "w-thumb";
-        if (p.cover) { const im = document.createElement("img"); im.src = p.cover; im.alt = ""; thumb.appendChild(im); }
-        else { thumb.textContent = (p.title || "?").trim().charAt(0).toUpperCase(); }
+        if (cover) {
+          const im = document.createElement("img");
+          im.src = asset(cover); im.alt = p.title || ""; im.loading = "lazy";
+          thumb.appendChild(im);
+        } else {
+          thumb.textContent = (p.title || "?").trim().charAt(0).toUpperCase();
+        }
 
         const main = document.createElement("span");
         main.className = "w-main";
