@@ -59,7 +59,7 @@ IMAGES = chiikawa/01.jpg, chiikawa/02.jpg, chiikawa/03.jpg, chiikawa/04.jpg
 [PROJECT]
 ID = cube-speaker
 TITLE = Cube Speaker (3D)
-YEAR = 2024
+YEAR = 2021
 CATEGORY = 3D / Product
 DESC = 3D modelling and rendering study.
 LINK =
@@ -69,23 +69,22 @@ IMAGES = cube-speaker/01.jpg, cube-speaker/02.jpg, cube-speaker/03.jpg
 [PROJECT]
 ID = your-planet
 TITLE = Your Planet (3D)
-YEAR = 2024
+YEAR = 2022
 CATEGORY = 3D render
 DESC = 3D concept render.
 LINK =
 COVER = your-planet/01.jpg
 IMAGES = your-planet/01.jpg, your-planet/02.jpg, your-planet/03.jpg
 
-# CHECK — iridescent crystal letterforms. Right title? Right year?
 [PROJECT]
-ID = crystal-type
-TITLE = Crystal Typography
+ID = concept
+TITLE = Concept
 YEAR = 2024
-CATEGORY = Typography
-DESC = Experimental crystal lettering.
+CATEGORY = Concept · Typography
+DESC = Experimental concept and typographic studies.
 LINK =
 COVER = crystal-type/01.jpg
-IMAGES = crystal-type/01.jpg, crystal-type/02.jpg, crystal-type/03.jpg, crystal-type/04.jpg
+IMAGES = crystal-type/01.jpg, crystal-type/02.jpg, crystal-type/03.jpg, crystal-type/04.jpg, type-23/01.jpg, type-23/02.jpg, type-23/03.jpg
 
 [PROJECT]
 ID = our-hour
@@ -118,17 +117,6 @@ LINK =
 COVER = geometric/01.jpg
 IMAGES = geometric/01.jpg, geometric/02.jpg, geometric/03.jpg
 
-# CHECK — halftone "23" typographic study. Right title? Right year?
-[PROJECT]
-ID = type-23
-TITLE = Type 23
-YEAR = 2023
-CATEGORY = Typography
-DESC = Typographic experiment.
-LINK =
-COVER = type-23/01.jpg
-IMAGES = type-23/01.jpg, type-23/02.jpg, type-23/03.jpg
-
 [PROJECT]
 ID = long-ear-monster
 TITLE = Long Ear Monster
@@ -142,7 +130,7 @@ IMAGES = long-ear-monster/01.jpg
 [PROJECT]
 ID = safe-cyberworld
 TITLE = 全城攜守網安在手 (Safe Cyberworld)
-YEAR = 2021
+YEAR = 2024
 CATEGORY = Tram body design
 DESC = "Together, We Create a Safe Cyberworld" — tram body design competition.
 LINK =
