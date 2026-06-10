@@ -74,7 +74,7 @@ CATEGORY = 3D render
 DESC = 3D concept render.
 LINK =
 COVER = your-planet/01.jpg
-IMAGES = your-planet/01.jpg, your-planet/02.jpg, your-planet/03.jpg, your-planet/04.jpg
+IMAGES = your-planet/01.jpg, your-planet/02.jpg, your-planet/03.jpg
 
 # CHECK — iridescent crystal letterforms. Right title? Right year?
 [PROJECT]
