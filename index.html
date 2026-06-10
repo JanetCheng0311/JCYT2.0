@@ -57,7 +57,7 @@
     display: inline-flex; align-items: baseline; gap: 2px;
     font-family: var(--font-sans);
     font-weight: 650; font-size: clamp(17px, 2vw, 21px);
-    letter-spacing: 0.30em; text-indent: 0.30em;
+    letter-spacing: 0.08em; text-indent: 0.08em;
     color: var(--fg); text-decoration: none;
     line-height: 1; user-select: none;
     transition: opacity .2s ease;
@@ -90,7 +90,7 @@
   }
   .overlay.open { opacity: 1; visibility: visible; transform: none; }
   .overlay nav { display: flex; flex-direction: column; gap: clamp(6px, 1.4vw, 14px); max-width: 1200px; margin: 0 auto; width: 100%; }
-  .overlay a {
+  .overlay nav a {
     display: flex; align-items: baseline; gap: 18px;
     color: var(--fg); text-decoration: none;
     font-family: var(--font-sans); font-weight: 600;
@@ -98,32 +98,44 @@
     letter-spacing: -0.02em;
     opacity: .55; transition: opacity .25s ease, transform .25s ease;
   }
-  .overlay a .idx {
+  .overlay nav a .idx {
     font-family: var(--font-mono); font-weight: 400;
     font-size: clamp(11px, 1.4vw, 14px); letter-spacing: 0.1em;
     opacity: .6; transform: translateY(-0.3em);
   }
-  .overlay a:hover, .overlay a:focus-visible { opacity: 1; transform: translateX(10px); outline: none; }
-  .overlay a[aria-disabled="true"] { cursor: default; }
-  .overlay a[aria-disabled="true"]:hover { transform: none; opacity: .7; }
+  .overlay nav a:hover, .overlay nav a:focus-visible { opacity: 1; transform: translateX(10px); outline: none; }
+  .overlay nav a[aria-disabled="true"] { cursor: default; }
+  .overlay nav a[aria-disabled="true"]:hover { transform: none; opacity: .7; }
   .overlay .soon {
     font-family: var(--font-mono); font-size: 10px; letter-spacing: .14em; text-transform: uppercase;
     opacity: .5; border: 1px solid color-mix(in srgb, var(--fg) 35%, transparent);
     border-radius: 999px; padding: 3px 8px; transform: translateY(-0.6em);
   }
   .overlay .foot {
-    margin-top: clamp(24px, 5vw, 48px); max-width: 1200px; margin-left: auto; margin-right: auto; width: 100%;
-    font-family: var(--font-mono); font-size: 12px; letter-spacing: .06em; opacity: .55;
+    margin-top: clamp(28px, 6vw, 56px); max-width: 1200px; margin-left: auto; margin-right: auto; width: 100%;
+    display: flex; flex-wrap: wrap; align-items: center; gap: 10px 22px;
+    font-family: var(--font-mono); font-size: 13px; letter-spacing: .04em;
   }
+  .overlay .foot a {
+    color: var(--fg); text-decoration: none; opacity: .75;
+    display: inline-flex; align-items: center; gap: 7px;
+    border-bottom: 1px solid color-mix(in srgb, var(--fg) 30%, transparent);
+    padding-bottom: 2px; transition: opacity .2s ease, border-color .2s ease;
+  }
+  .overlay .foot a:hover { opacity: 1; border-color: var(--accent, #bcd0ff); }
+  .overlay .foot a::before { content: "↗"; font-size: 11px; opacity: .6; }
+  .overlay .foot a.mail::before { content: "✉"; }
+  .overlay .foot .year { opacity: .45; margin-left: auto; }
 
   /* ---- Bottom control dock ---- */
   .hud {
     position: fixed; z-index: 20;
     left: var(--pad);
     bottom: max(var(--pad), calc(env(safe-area-inset-bottom) + 12px));
-    display: flex; gap: 8px; flex-wrap: wrap; align-items: center;
+    display: flex; flex-direction: column; gap: 8px; align-items: flex-start;
     user-select: none;
   }
+  .hud-row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
   .btn {
     font-family: var(--font-mono);
     font-size: 12.5px; font-weight: 500; letter-spacing: 0.02em;
@@ -178,19 +190,28 @@
       <a href="./"><span class="idx">01</span>Home</a>
       <a href="#" aria-disabled="true"><span class="idx">02</span>Work <span class="soon">soon</span></a>
       <a href="#" aria-disabled="true"><span class="idx">03</span>About <span class="soon">soon</span></a>
-      <a href="#" aria-disabled="true"><span class="idx">04</span>Contact <span class="soon">soon</span></a>
+      <a href="mailto:janetcheng0311@gmail.com"><span class="idx">04</span>Contact</a>
     </nav>
-    <div class="foot">JCYT — portfolio · 2026</div>
+    <div class="foot">
+      <a class="mail" href="mailto:janetcheng0311@gmail.com">janetcheng0311@gmail.com</a>
+      <a href="https://github.com/JanetCheng0311?tab=repositories" target="_blank" rel="noopener">GitHub</a>
+      <a href="https://www.instagram.com/jcyt.prj" target="_blank" rel="noopener">Instagram</a>
+      <span class="year">© 2026 JCYT</span>
+    </div>
   </div>
 
   <!-- Bottom control dock -->
   <div class="hud">
-    <button id="pause" class="btn" title="Play / pause animation">⏸ Pause</button>
-    <button id="next" class="btn" title="Release a fresh set of particles">✦ Reseed</button>
-    <span class="mode-name label" id="modeName">flow field</span>
-    <span class="label dotsep">·</span>
-    <div class="swatches" id="swatches"></div>
-    <button id="autocolor" class="btn" title="Auto-cycle colors" aria-pressed="false">Auto-color: off</button>
+    <div class="hud-row">
+      <button id="autocolor" class="btn" title="Auto-cycle colors" aria-pressed="false">Auto-color: off</button>
+    </div>
+    <div class="hud-row">
+      <button id="pause" class="btn" title="Play / pause animation">⏸ Pause</button>
+      <button id="next" class="btn" title="Release a fresh set of particles">✦ Reseed</button>
+      <span class="mode-name label" id="modeName">flow field</span>
+      <span class="label dotsep">·</span>
+      <div class="swatches" id="swatches"></div>
+    </div>
   </div>
 
 <script>
@@ -434,10 +455,10 @@ function setMenu(open) {
 }
 menuBtn.addEventListener("click", () => setMenu(!overlay.classList.contains("open")));
 overlay.addEventListener("click", (e) => {
-  // close when clicking empty space or a real link; ignore disabled links
+  // ignore disabled links; otherwise backdrop or any real link closes the menu
   const a = e.target.closest("a");
   if (a && a.getAttribute("aria-disabled") === "true") { e.preventDefault(); return; }
-  if (!a || a.getAttribute("href") === "./") setMenu(false);
+  setMenu(false);
 });
 document.addEventListener("keydown", (e) => { if (e.key === "Escape") setMenu(false); });
 
