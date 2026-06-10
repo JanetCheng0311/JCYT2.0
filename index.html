@@ -3,13 +3,9 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-<title>ASCII — Generative</title>
+<title>ASCII — Flow Field</title>
 <style>
-  :root {
-    /* active palette is injected by JS as CSS vars too, for UI chrome */
-    --bg: #1d3fd1;
-    --fg: #f4f1e8;
-  }
+  :root { --bg: #1d3fd1; --fg: #f4f1e8; }
   * { margin: 0; padding: 0; box-sizing: border-box; }
   html, body { height: 100%; }
   body {
@@ -19,17 +15,15 @@
     overflow: hidden;
     -webkit-text-size-adjust: 100%;
   }
-  /* canvas fills the viewport on every device, safe-area aware */
   #art {
     display: block;
     position: fixed;
     inset: 0;
     width: 100vw;
     height: 100vh;
-    height: 100dvh; /* correct on mobile browsers w/ dynamic toolbars */
+    height: 100dvh;
     touch-action: manipulation;
   }
-  /* minimal floating controls */
   .hud {
     position: fixed;
     left: max(16px, env(safe-area-inset-left));
@@ -63,7 +57,6 @@
     letter-spacing: 0.08em;
     text-transform: uppercase;
   }
-  /* swatches */
   .swatches { display: flex; gap: 6px; }
   .swatch {
     width: 22px; height: 22px;
@@ -75,18 +68,16 @@
   }
   .swatch:hover { transform: scale(1.12); }
   .swatch[aria-pressed="true"] { outline: 2px solid var(--fg); outline-offset: 2px; }
-  @media (max-width: 480px) {
-    .hud .mode-name { display: none; }
-  }
+  @media (max-width: 480px) { .hud .mode-name { display: none; } }
 </style>
 </head>
 <body>
-  <canvas id="art" aria-label="Generative ASCII artwork"></canvas>
+  <canvas id="art" aria-label="Generative ASCII flow-field artwork"></canvas>
 
   <div class="hud">
     <button id="pause" title="Play / pause animation">⏸ Pause</button>
-    <button id="next" title="Jump to next style">Style →</button>
-    <span class="mode-name label" id="modeName">drift</span>
+    <button id="next" title="Release a fresh set of particles">✦ Reseed</button>
+    <span class="mode-name label" id="modeName">flow field</span>
     <span class="label">·</span>
     <div class="swatches" id="swatches"></div>
     <button id="autocolor" title="Auto-cycle colors" aria-pressed="false">Auto-color: off</button>
@@ -94,32 +85,59 @@
 
 <script>
 /* =====================================================================
-   Generative ASCII artwork
-   - Responsive: rebuilds character grid for any viewport, retina-sharp
-   - Morphs through styles: flow → density → stitch → contour → ...
-   - Palette system with a startable color-change function (starts blue)
+   Generative ASCII — Perlin flow field + particle trails
+   Inspired by the classic p5.js / Coding Train flow-field sketches:
+   particles drift through a Perlin-noise vector field and leave trails,
+   "like leaves in the wind". Their accumulated paths are rendered as a
+   single digit ramp, so it reads as flowing rivers of numbers.
    ===================================================================== */
 
-/* ---------- 1. Palettes (blue first, per your 3rd reference image) ---------- */
+/* ---------- Palettes (blue first) ---------- */
 const PALETTES = {
-  cobalt:   { name: "cobalt",   bg: "#1d3fd1", ink: "#f4f1e8", accent: "#9fb4ff" },
-  blueprint:{ name: "blueprint",bg: "#0a1f6e", ink: "#cfe0ff", accent: "#5b8cff" },
-  ink:      { name: "ink",      bg: "#f4f1e8", ink: "#16357a", accent: "#3a63d0" }, // cream w/ blue ink (like ref #2)
+  cobalt:   { name: "cobalt",   bg: "#1d3fd1", ink: "#f4f1e8", accent: "#bcd0ff" },
+  blueprint:{ name: "blueprint",bg: "#0a1f6e", ink: "#cfe0ff", accent: "#7ea8ff" },
+  ink:      { name: "ink",      bg: "#f4f1e8", ink: "#16357a", accent: "#3a63d0" },
   ember:    { name: "ember",    bg: "#160d0a", ink: "#ff7a3c", accent: "#ffd0a0" },
-  mono:     { name: "mono",     bg: "#0c0c0c", ink: "#e9e9e9", accent: "#888888" },
-  jade:     { name: "jade",     bg: "#062b22", ink: "#a9f0d1", accent: "#3fbf8f" },
+  mono:     { name: "mono",     bg: "#0c0c0c", ink: "#e9e9e9", accent: "#9aa0aa" },
+  jade:     { name: "jade",     bg: "#062b22", ink: "#a9f0d1", accent: "#5fe0aa" },
 };
 const PALETTE_ORDER = ["cobalt", "blueprint", "ink", "jade", "ember", "mono"];
 let palette = PALETTES.cobalt;
 
-/* ---------- 2. Canvas setup ---------- */
+/* ---------- Canvas ---------- */
 const canvas = document.getElementById("art");
 const ctx = canvas.getContext("2d", { alpha: false });
 let W = 0, H = 0, DPR = 1;
-let cols = 0, rows = 0, cell = 14;
+let cols = 0, rows = 0, cell = 11;
+
+// trail intensity grid + particles
+let trail = null;
+let particles = [];
+let prevCells = -1;
+
+function targetParticleCount() {
+  return Math.min(1900, Math.max(260, Math.round(cols * rows * 0.32)));
+}
+
+function spawn(p) {
+  p = p || {};
+  p.x = Math.random() * cols;
+  p.y = Math.random() * rows;
+  p.life = 0;
+  p.maxLife = 40 + (Math.random() * 140 | 0);
+  return p;
+}
+function buildParticles() {
+  const n = targetParticleCount();
+  particles = new Array(n);
+  for (let i = 0; i < n; i++) particles[i] = spawn({});
+}
+function reseed() {                         // fresh streams on demand
+  for (let i = 0; i < particles.length; i++) spawn(particles[i]);
+}
 
 function resize() {
-  DPR = Math.min(window.devicePixelRatio || 1, 2); // cap for perf on retina
+  DPR = Math.min(window.devicePixelRatio || 1, 2);
   W = window.innerWidth;
   H = window.innerHeight;
   canvas.width = Math.floor(W * DPR);
@@ -128,26 +146,30 @@ function resize() {
   canvas.style.height = H + "px";
   ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
 
-  // cell size scales with screen — dense fill on every device
   const minSide = Math.min(W, H);
-  cell = Math.max(7, Math.min(13, Math.round(minSide / 64)));
+  cell = Math.max(7, Math.min(12, Math.round(minSide / 60)));
   cols = Math.ceil(W / cell) + 1;
   rows = Math.ceil(H / cell) + 1;
 
   ctx.font = `${cell + 1}px ui-monospace, Menlo, Consolas, monospace`;
   ctx.textBaseline = "top";
+
+  if (!trail || prevCells !== cols * rows) {
+    prevCells = cols * rows;
+    trail = new Float32Array(cols * rows);
+    buildParticles();
+  }
 }
 window.addEventListener("resize", resize, { passive: true });
 window.addEventListener("orientationchange", resize, { passive: true });
 
-/* ---------- 3. Lightweight value-noise (no deps) ---------- */
-// Hash-based smooth noise, good enough for flow fields & density.
+/* ---------- Value-noise → smooth flow field ---------- */
 function hash(x, y) {
   let h = x * 374761393 + y * 668265263;
   h = (h ^ (h >> 13)) * 1274126177;
   return ((h ^ (h >> 16)) >>> 0) / 4294967295;
 }
-function smooth(t) { return t * t * (3 - 2 * t); }
+const smooth = (t) => t * t * (3 - 2 * t);
 function noise2(x, y) {
   const xi = Math.floor(x), yi = Math.floor(y);
   const xf = x - xi, yf = y - yi;
@@ -156,75 +178,26 @@ function noise2(x, y) {
   const u = smooth(xf), v = smooth(yf);
   return (a * (1 - u) + b * u) * (1 - v) + (c * (1 - u) + d * u) * v;
 }
-function fbm(x, y) { // fractal noise for organic structure
+function fbm(x, y) {
   let v = 0, amp = 0.5, freq = 1;
   for (let i = 0; i < 3; i++) { v += amp * noise2(x * freq, y * freq); freq *= 2; amp *= 0.5; }
-  return v;
+  return v; // ~0..0.875
 }
 
-/* ---------- 4. ONE unified character ramp ---------- */
-// A single light→dark density ramp. Digits and symbols live on the SAME
-// ramp ordered by visual weight, so the art never looks like "two styles".
-// Two leading spaces give a little breathing room; everything else fills.
-// Digits only, ordered light → heavy by how much ink each glyph carries.
-// One leading space keeps a little breathing room; everything else is a number.
+/* ---------- Digit ramp (one consistent style) ---------- */
 const RAMP = " 1742356908".split("");
 const RLAST = RAMP.length - 1;
 
-/* ---------- 5. Movements ----------
-   Not different styles — different *motions* of the same dense field.
-   They share the ramp above; only the flow/warp/contrast params change,
-   so the character language stays consistent the whole time. */
-// Same FLOW for every movement + similar scales => the motion speed stays
-// constant the whole time; movements differ only in pattern, never in speed.
-const FLOW = [0.045, 0.030, 0.028];
-const MOVEMENTS = [
-  { name: "drift",  scale: 0.052, warp: 2.4, gamma: 1.05, lobe: 0.42, flow: FLOW },
-  { name: "weave",  scale: 0.060, warp: 1.8, gamma: 0.92, lobe: 0.32, flow: FLOW },
-  { name: "ripple", scale: 0.046, warp: 3.2, gamma: 1.22, lobe: 0.50, flow: FLOW },
-  { name: "swirl",  scale: 0.056, warp: 2.9, gamma: 1.05, lobe: 0.38, flow: FLOW },
-];
-const FBM_NORM = 1 / 0.875; // normalize 3-octave fbm back to ~0..1
+/* ---------- Simulation constants (fixed => constant speed) ---------- */
+const FS = 0.055;       // flow-field spatial scale
+const SPEED = 0.85;     // particle step (cells / frame)
+const Z_STEP = 0.010;   // how fast the field itself evolves
+const FADE = 0.93;      // trail persistence (higher = longer streaks)
+const DEPOSIT = 0.5;    // ink dropped per particle per frame
+const TCAP = 6;         // max trail intensity before clamp
+const TNORM = 0.32;     // intensity → 0..1 mapping (lower = more gradient)
 
-// Domain-warped density field — the source of the organic, flowing look.
-function field(fx, fy, t, P) {
-  const s = P.scale, fa = P.flow;
-  // two-stage domain warp -> organic, flowing structure
-  const q1 = fbm(fx * s + t * fa[0], fy * s);
-  const q2 = fbm(fx * s + 5.2, fy * s + t * fa[1] + 1.3);
-  const nx = fx * s + P.warp * (q1 - 0.45);
-  const ny = fy * s + P.warp * (q2 - 0.45) + t * fa[2];
-  const w = fbm(nx, ny) * FBM_NORM;                              // base mass 0..1
-  // ridged higher-freq layer -> flowing "vein" lines like the contour refs
-  const ridg = 1 - Math.abs(fbm(nx * 2.3 + 11.0, ny * 2.3) * FBM_NORM * 2 - 1);
-  // slow large lobe -> big light/dark masses drift through (a subject emerging)
-  const lobe = fbm(fx * 0.013 + t * 0.008, fy * 0.013 + 9.1) * FBM_NORM;
-  let v = w * 0.6 + ridg * 0.4;
-  v = v * (1 - P.lobe) + lobe * P.lobe;
-  // contrast + brighten so the heavier digits (8 0 9 6) actually appear
-  v = (v - 0.5) * 2.1 + 0.5;
-  v = v < 0 ? 0 : v > 1 ? 1 : v;
-  return Math.pow(v, 0.72 * P.gamma);
-}
-
-// Smoothly blend two movement param sets (used while morphing between them).
-function lerpMove(A, B, k) {
-  const L = (a, b) => a + (b - a) * k;
-  return {
-    name: k < 0.5 ? A.name : B.name,
-    scale: L(A.scale, B.scale), warp: L(A.warp, B.warp),
-    gamma: L(A.gamma, B.gamma), lobe: L(A.lobe, B.lobe),
-    flow: [L(A.flow[0], B.flow[0]), L(A.flow[1], B.flow[1]), L(A.flow[2], B.flow[2])],
-  };
-}
-
-/* ---------- 6. Animation loop (dense, single-ramp render) ---------- */
-let mvIndex = 0;          // current movement
-let mvNext = 0;           // movement we're easing toward
-let mvK = 1;              // 0..1 blend between current and next movement
-const MOVE_HOLD = 11000;  // ms each movement holds before auto-advancing
-let lastSwitch = 0;
-let t = 0;                // virtual time (advances only while playing)
+let z = 0;
 let playing = true;
 let lastFrame = 0;
 
@@ -232,13 +205,29 @@ function hexToRgb(h) {
   const n = parseInt(h.slice(1), 16);
   return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
 }
-const easeInOut = (k) => k * k * (3 - 2 * k);
 
-function advanceStyle() {
-  mvIndex = mvNext;
-  mvNext = (mvIndex + 1) % MOVEMENTS.length;
-  mvK = 0;
-  document.getElementById("modeName").textContent = MOVEMENTS[mvNext].name;
+function step() {
+  z += Z_STEP;
+  // fade existing trails
+  for (let i = 0; i < trail.length; i++) trail[i] *= FADE;
+
+  const TWO_PI = Math.PI * 2;
+  for (let i = 0; i < particles.length; i++) {
+    const p = particles[i];
+    // flow angle from the (animated) noise field
+    const a = fbm(p.x * FS, p.y * FS + z) * TWO_PI * 2.2;
+    p.x += Math.cos(a) * SPEED;
+    p.y += Math.sin(a) * SPEED;
+    // wrap toroidally
+    if (p.x < 0) p.x += cols; else if (p.x >= cols) p.x -= cols;
+    if (p.y < 0) p.y += rows; else if (p.y >= rows) p.y -= rows;
+    // deposit ink into the trail grid
+    const idx = (p.y | 0) * cols + (p.x | 0);
+    const t = trail[idx] + DEPOSIT;
+    trail[idx] = t > TCAP ? TCAP : t;
+    // recycle so streams keep forming and dissolving
+    if (++p.life > p.maxLife) spawn(p);
+  }
 }
 
 function frame(now) {
@@ -246,53 +235,39 @@ function frame(now) {
   const dt = Math.min(50, now - lastFrame || 16);
   lastFrame = now;
 
-  if (playing) {
-    t += dt * 0.001 * 9; // animation speed
-    if (now - lastSwitch > MOVE_HOLD) { lastSwitch = now; advanceStyle(); }
-  }
-  if (mvK < 1) mvK = Math.min(1, mvK + dt / 2200); // slow ease between movements
+  if (playing && trail) step();
 
-  // active (blended) movement params — one field, one ramp, fully unified
-  const P = mvK >= 1
-    ? MOVEMENTS[mvIndex]
-    : lerpMove(MOVEMENTS[mvIndex], MOVEMENTS[mvNext], easeInOut(mvK));
-
-  // background
   ctx.fillStyle = palette.bg;
   ctx.fillRect(0, 0, W, H);
+  if (!trail) return;
 
-  const inkRGB = hexToRgb(palette.ink);
-  const accRGB = hexToRgb(palette.accent);
-  const inkStr = inkRGB.join(",");
-  const accStr = accRGB.join(",");
+  const inkStr = hexToRgb(palette.ink).join(",");
+  const accStr = hexToRgb(palette.accent).join(",");
 
   for (let r = 0; r < rows; r++) {
-    const yPx = r * cell;
+    const yPx = r * cell, row = r * cols;
     for (let c = 0; c < cols; c++) {
-      const v = field(c, r, t, P);
-      const ch = RAMP[(v * RLAST) | 0];
-      if (ch === " ") continue;                 // sparse breathing space only
-      const alpha = 0.34 + 0.66 * v;            // keep even light digits watchable
-      const rgb = v > 0.82 ? accStr : inkStr;   // brightest cells pick up accent
-      ctx.fillStyle = `rgba(${rgb},${alpha.toFixed(3)})`;
+      let d = trail[row + c] * TNORM;    // normalize intensity → 0..~1
+      if (d <= 0.02) continue;
+      if (d > 1) d = 1;
+      const ch = RAMP[(d * RLAST) | 0];
+      if (ch === " ") continue;
+      const alpha = 0.25 + 0.75 * d;
+      ctx.fillStyle = `rgba(${d > 0.78 ? accStr : inkStr},${alpha.toFixed(3)})`;
       ctx.fillText(ch, c * cell, yPx);
     }
   }
 }
 
-/* ---------- 7. Palette / color-change function ---------- */
+/* ---------- Palette / color-change ---------- */
 function setPalette(nameOrPalette) {
   palette = typeof nameOrPalette === "string" ? (PALETTES[nameOrPalette] || palette) : nameOrPalette;
   document.documentElement.style.setProperty("--bg", palette.bg);
   document.documentElement.style.setProperty("--fg", palette.ink);
-  // reflect pressed state on swatches
   document.querySelectorAll(".swatch").forEach(s =>
     s.setAttribute("aria-pressed", String(s.dataset.pal === palette.name)));
 }
-
-// Auto color-cycling (the "color changing function" — starts OFF on blue)
-let autoColor = false;
-let colorTimer = null;
+let autoColor = false, colorTimer = null;
 function startColorCycle(intervalMs = 7000) {
   stopColorCycle();
   autoColor = true;
@@ -304,7 +279,7 @@ function startColorCycle(intervalMs = 7000) {
 }
 function stopColorCycle() { autoColor = false; if (colorTimer) clearInterval(colorTimer); colorTimer = null; }
 
-/* ---------- 8. HUD wiring ---------- */
+/* ---------- HUD ---------- */
 function buildSwatches() {
   const wrap = document.getElementById("swatches");
   wrap.innerHTML = "";
@@ -331,24 +306,18 @@ document.getElementById("pause").addEventListener("click", (e) => {
   playing = !playing;
   e.target.textContent = playing ? "⏸ Pause" : "▶ Play";
 });
-document.getElementById("next").addEventListener("click", () => {
-  lastSwitch = performance.now();
-  advanceStyle();
-});
+document.getElementById("next").addEventListener("click", reseed);
 document.getElementById("autocolor").addEventListener("click", () => {
   if (autoColor) stopColorCycle(); else startColorCycle();
   updateAutoBtn();
 });
+canvas.addEventListener("dblclick", reseed);
 
-// double-tap / double-click the art to advance style (nice on touch devices)
-canvas.addEventListener("dblclick", () => { lastSwitch = performance.now(); advanceStyle(); });
-
-/* ---------- 9. Boot ---------- */
+/* ---------- Boot ---------- */
 resize();
-setPalette("cobalt");   // start on the blue you liked
+setPalette("cobalt");
 buildSwatches();
 updateAutoBtn();
-lastSwitch = performance.now();
 requestAnimationFrame(frame);
 </script>
 </body>
