@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>Work — JCYT</title>
+<link rel="stylesheet" href="assets/style.css" />
+</head>
+<body class="page-view">
+  <canvas id="art" aria-hidden="true"></canvas>
+  <div class="veil"></div>
+
+  <!-- Top bar: logo + menu -->
+  <header class="topbar">
+    <a class="logo" href="./" aria-label="JCYT — home">JCYT<span class="dot">.</span></a>
+    <button id="menuBtn" class="menu-btn" aria-label="Open menu" aria-expanded="false" aria-controls="overlay">
+      <span class="ln"></span><span class="ln"></span><span class="ln"></span>
+    </button>
+  </header>
+
+  <!-- Full-screen menu -->
+  <div id="overlay" class="overlay" role="dialog" aria-modal="true" aria-label="Site menu">
+    <nav>
+      <a href="./"><span class="idx">01</span>Home</a>
+      <a href="work.html" class="current"><span class="idx">02</span>Work</a>
+      <a href="about.html"><span class="idx">03</span>About</a>
+      <a href="contact.html"><span class="idx">04</span>Contact</a>
+    </nav>
+    <div class="foot">
+      <a class="mail" href="mailto:janetcheng0311@gmail.com">janetcheng0311@gmail.com</a>
+      <a href="https://github.com/JanetCheng0311?tab=repositories" target="_blank" rel="noopener">GitHub</a>
+      <a href="https://www.instagram.com/jcyt.prj" target="_blank" rel="noopener">Instagram</a>
+      <span class="year">© 2026 JCYT</span>
+    </div>
+  </div>
+
+  <!-- Year bar (filled in by script) -->
+  <ul class="workrail" id="workrail" aria-label="Jump to year"></ul>
+
+  <!-- Work content -->
+  <main class="page work">
+    <div class="page-inner">
+      <p class="kicker">Selected Work</p>
+      <h1 class="page-title">Work</h1>
+      <p class="work-count" id="work-count"></p>
+      <div id="work-list"></div>
+    </div>
+  </main>
+
+  <!-- Gallery / lightbox -->
+  <div id="gallery" class="gallery" role="dialog" aria-modal="true" aria-label="Project gallery">
+    <button class="gal-close" id="gal-close" aria-label="Close gallery">✕</button>
+    <div class="gal-stage" id="gal-stage">
+      <button class="gal-btn gal-prev" id="gal-prev" aria-label="Previous image">‹</button>
+      <div id="gal-slot"></div>
+      <button class="gal-btn gal-next" id="gal-next" aria-label="Next image">›</button>
+    </div>
+    <div class="gal-meta">
+      <span class="gal-title" id="gal-title"></span>
+      <span class="gal-count" id="gal-count"></span>
+    </div>
+  </div>
+
+  <!-- shared background animation + menu -->
+  <script src="assets/app.js"></script>
+
+  <!-- =====================================================================
+       This page builds itself from the plain-text file:  content/work.txt
+       Edit that file (or double-click "1-Edit-content.command") to change,
+       add or remove projects. You don't need to touch the code below.
+       ===================================================================== -->
+  <script>
+  // ---- parse content/work.txt into a list of projects ----
+  function parseWork(text) {
+    const projects = [];
+    let cur = null;
+    const push = () => { if (cur && (cur.title || cur.year)) projects.push(cur); };
+    text.split(/\r?\n/).forEach((raw) => {
+      const line = raw.trim();
+      if (!line || line.startsWith("#")) return;
+      if (/^\[PROJECT\]/i.test(line)) { push(); cur = { title: "", year: "", category: "", desc: "", link: "", cover: "", images: [] }; return; }
+      if (!cur) cur = { title: "", year: "", category: "", desc: "", link: "", cover: "", images: [] };
+      const kv = line.match(/^([A-Z]+)\s*=\s*(.*)$/i);
+      if (!kv) return;
+      const key = kv[1].toUpperCase(), val = kv[2].trim();
+      if (key === "TITLE") cur.title = val;
+      else if (key === "YEAR") cur.year = val;
+      else if (key === "CATEGORY") cur.category = val;
+      else if (key === "DESC") cur.desc = val;
+      else if (key === "LINK") cur.link = val;
+      else if (key === "COVER") cur.cover = val;
+      else if (key === "IMAGES") cur.images = val ? val.split(",").map((s) => s.trim()).filter(Boolean) : [];
+    });
+    push();
+    return projects;
+  }
+
+  // ---- gallery state ----
+  const gallery = document.getElementById("gallery");
+  const galSlot = document.getElementById("gal-slot");
+  const galTitle = document.getElementById("gal-title");
+  const galCount = document.getElementById("gal-count");
+  let galImages = [], galIndex = 0, galName = "";
+
+  function galRender() {
+    const src = galImages[galIndex];
+    galSlot.innerHTML = "";
+    if (src) {
+      const img = document.createElement("img");
+      img.src = src; img.alt = galName + " — image " + (galIndex + 1);
+      galSlot.appendChild(img);
+    } else {
+      const ph = document.createElement("div");
+      ph.className = "gal-ph";
+      ph.innerHTML = "<b></b><span>Images coming soon — add the files to <b style='font-weight:600'>assets/work/</b> and list them under IMAGES = in content/work.txt</span>";
+      ph.querySelector("b").textContent = galName;
+      galSlot.appendChild(ph);
+    }
+    galTitle.textContent = galName;
+    galCount.textContent = (galIndex + 1) + " / " + galImages.length;
+    gallery.classList.toggle("gal-single", galImages.length <= 1);
+  }
+  function openGallery(p) {
+    galName = p.title;
+    galImages = (p.images && p.images.length) ? p.images.slice() : [null]; // [null] => placeholder
+    galIndex = 0;
+    galRender();
+    gallery.classList.add("open");
+  }
+  function closeGallery() { gallery.classList.remove("open"); }
+  function galStep(d) { galIndex = (galIndex + d + galImages.length) % galImages.length; galRender(); }
+
+  document.getElementById("gal-close").addEventListener("click", closeGallery);
+  document.getElementById("gal-prev").addEventListener("click", () => galStep(-1));
+  document.getElementById("gal-next").addEventListener("click", () => galStep(1));
+  gallery.addEventListener("click", (e) => { if (e.target === gallery) closeGallery(); });
+  document.addEventListener("keydown", (e) => {
+    if (!gallery.classList.contains("open")) return;
+    if (e.key === "Escape") closeGallery();
+    else if (e.key === "ArrowLeft") galStep(-1);
+    else if (e.key === "ArrowRight") galStep(1);
+  });
+
+  // ---- render the table + year rail ----
+  function renderWork(projects) {
+    // sort newest year first; keep original order within a year
+    projects.forEach((p, i) => (p._i = i));
+    projects.sort((a, b) => (parseInt(b.year || 0) - parseInt(a.year || 0)) || (a._i - b._i));
+
+    document.getElementById("work-count").textContent =
+      projects.length + (projects.length === 1 ? " project" : " projects");
+
+    const years = [];
+    const byYear = {};
+    projects.forEach((p) => {
+      const y = p.year || "—";
+      if (!byYear[y]) { byYear[y] = []; years.push(y); }
+      byYear[y].push(p);
+    });
+
+    // year rail
+    const rail = document.getElementById("workrail");
+    rail.innerHTML = "";
+    years.forEach((y, i) => {
+      const li = document.createElement("li");
+      const b = document.createElement("button");
+      b.className = "yb-tick"; b.dataset.year = y;
+      b.innerHTML = '<span class="mark"></span><span class="yr"></span>';
+      b.querySelector(".yr").textContent = y;
+      b.addEventListener("click", () => {
+        const g = document.getElementById("y-" + y);
+        if (g) g.scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+      li.appendChild(b);
+      rail.appendChild(li);
+      // minor ruler tick between years
+      if (i < years.length - 1) {
+        const m = document.createElement("li");
+        m.className = "yb-minor"; m.setAttribute("aria-hidden", "true");
+        m.innerHTML = '<span class="mark"></span>';
+        rail.appendChild(m);
+      }
+    });
+
+    // table groups
+    const list = document.getElementById("work-list");
+    list.innerHTML = "";
+    years.forEach((y) => {
+      const group = document.createElement("section");
+      group.className = "year-group"; group.id = "y-" + y; group.dataset.year = y;
+      const head = document.createElement("div");
+      head.className = "year-head"; head.textContent = y;
+      group.appendChild(head);
+
+      const ul = document.createElement("ul");
+      ul.className = "work-table";
+      byYear[y].forEach((p, idx) => {
+        const li = document.createElement("li");
+        const row = document.createElement("button");
+        row.className = "work-row"; row.type = "button";
+
+        const thumb = document.createElement("span");
+        thumb.className = "w-thumb";
+        if (p.cover) { const im = document.createElement("img"); im.src = p.cover; im.alt = ""; thumb.appendChild(im); }
+        else { thumb.textContent = (p.title || "?").trim().charAt(0).toUpperCase(); }
+
+        const main = document.createElement("span");
+        main.className = "w-main";
+        const t = document.createElement("span"); t.className = "w-title"; t.textContent = p.title || "Untitled";
+        const m = document.createElement("span"); m.className = "w-meta";
+        m.textContent = [p.category, p.desc].filter(Boolean).join("  —  ");
+        main.appendChild(t); main.appendChild(m);
+
+        const arrow = document.createElement("span"); arrow.className = "w-arrow"; arrow.textContent = "↗";
+
+        row.appendChild(thumb); row.appendChild(main); row.appendChild(arrow);
+        row.addEventListener("click", () => openGallery(p));
+        li.appendChild(row);
+        ul.appendChild(li);
+      });
+      group.appendChild(ul);
+      list.appendChild(group);
+    });
+
+    // active-year tracking via scroll
+    const ticks = {};
+    rail.querySelectorAll(".yb-tick").forEach((t) => (ticks[t.dataset.year] = t));
+    function setActive(y) {
+      Object.values(ticks).forEach((t) => t.classList.remove("active"));
+      if (ticks[y]) ticks[y].classList.add("active");
+    }
+    setActive(years[0]);
+    const groups = list.querySelectorAll(".year-group");
+    if ("IntersectionObserver" in window) {
+      const obs = new IntersectionObserver((entries) => {
+        entries.forEach((e) => { if (e.isIntersecting) setActive(e.target.dataset.year); });
+      }, { rootMargin: "-38% 0px -57% 0px", threshold: 0 });
+      groups.forEach((g) => obs.observe(g));
+    }
+  }
+
+  fetch("content/work.txt", { cache: "no-store" })
+    .then((r) => { if (!r.ok) throw new Error("not found"); return r.text(); })
+    .then((t) => renderWork(parseWork(t)))
+    .catch(() => {
+      document.getElementById("work-count").textContent = "Loads from content/work.txt — open via the live site or “Preview locally”.";
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,137 @@
+# ============================================================
+#  JCYT — WORK / PROJECTS
+#  Edit the projects below, then double-click "3-Publish-to-website.command".
+#
+#  HOW IT WORKS
+#  - Each project is one [PROJECT] block.
+#  - To ADD a project: copy a whole [PROJECT] block and change the words.
+#  - To REMOVE a project: delete its whole [PROJECT] block.
+#  - The page sorts projects by YEAR automatically (newest first) and the
+#    year ruler on the side follows your scroll.
+#
+#  FIELDS
+#  TITLE    = the project name
+#  YEAR     = a year number, e.g. 2024  (drives the year ruler + sorting)
+#  CATEGORY = a short label, e.g. Poster design
+#  DESC     = one short sentence about it
+#  LINK     = an optional web link (leave empty if none)
+#  COVER    = optional small thumbnail (leave empty to show a letter tile)
+#  IMAGES   = the gallery images, comma-separated. All images live in
+#             assets/work/  — just write their file names here.
+#
+#  >>> Lines marked  "# CHECK"  are images I could not match for sure.
+#      Please rename/move them or fix the title & year, then publish.
+# ============================================================
+
+[PROJECT]
+TITLE = GRAFRI 筆跡研究所
+YEAR = 2025
+CATEGORY = Capstone · Branding
+DESC = Promoting Chinese graphology in Hong Kong — identity and introduction video.
+LINK =
+COVER =
+IMAGES = grafri-logo.png, grafri-intro.jpg
+
+[PROJECT]
+TITLE = 永恆一刻 (Eternal Moment)
+YEAR = 2024
+CATEGORY = Poster design
+DESC = 2nd runner-up — 42nd HK Film Awards Student Poster Design Competition.
+LINK =
+COVER =
+IMAGES = hkfaa-eternal-moment.jpg
+
+[PROJECT]
+TITLE = 如何畫一隻自己的吉伊卡哇 (Draw your own Chiikawa)
+YEAR = 2024
+CATEGORY = School project · Illustration
+DESC = An illustrated how-to guide.
+LINK =
+COVER =
+IMAGES = chiikawa.jpg
+
+# CHECK — 3D render of a cube speaker. Right title? Right year?
+[PROJECT]
+TITLE = Cube Speaker (3D)
+YEAR = 2024
+CATEGORY = 3D / Product
+DESC = 3D modelling and rendering study.
+LINK =
+COVER =
+IMAGES = cube-speaker-3d.jpg
+
+# CHECK — 3D render reading "YOUR PLANET". Right title? Right year?
+[PROJECT]
+TITLE = Your Planet (3D)
+YEAR = 2024
+CATEGORY = 3D render
+DESC = 3D concept render.
+LINK =
+COVER =
+IMAGES = your-planet-3d.jpg
+
+# CHECK — iridescent crystal letterforms. Right title? Right year?
+[PROJECT]
+TITLE = Crystal Typography
+YEAR = 2024
+CATEGORY = Typography
+DESC = Experimental crystal lettering.
+LINK =
+COVER =
+IMAGES = crystal-type.jpg
+
+[PROJECT]
+TITLE = 24/7 — Our Hour
+YEAR = 2023
+CATEGORY = Poster / Print
+DESC = Silver, IDA New Graphic Design Award (with Korean university students); Honorable Mention, Graphis New Talent.
+LINK = https://graphis.com/entry/b038f481-5c1e-443b-9acf-49d831145a6c
+COVER =
+IMAGES = our-hour-a.jpg, our-hour-b.jpg
+
+[PROJECT]
+TITLE = Math Soup (Campbell's × Duolingo)
+YEAR = 2023
+CATEGORY = Brand concept · D&AD
+DESC = 2023 D&AD New Blood entry — a playful Campbell's × Duolingo crossover.
+LINK =
+COVER =
+IMAGES = campbells-maths-soup.jpg
+
+# CHECK — flat blue geometric design with cutlery/buildings. Right title? Right year?
+[PROJECT]
+TITLE = Geometric Identity Study
+YEAR = 2023
+CATEGORY = Branding
+DESC = Geometric visual-identity exploration.
+LINK =
+COVER =
+IMAGES = blue-geometric.jpg
+
+# CHECK — halftone "23" typographic study. Right title? Right year?
+[PROJECT]
+TITLE = Type 23
+YEAR = 2023
+CATEGORY = Typography
+DESC = Typographic experiment.
+LINK =
+COVER =
+IMAGES = type-23.png
+
+[PROJECT]
+TITLE = Long Ear Monster
+YEAR = 2022
+CATEGORY = Character / Toy design
+DESC = Character design and a handmade comfort soft toy.
+LINK =
+COVER =
+IMAGES = long-ear-monster.jpg
+
+[PROJECT]
+TITLE = 全城攜守網安在手 (Safe Cyberworld)
+YEAR = 2021
+CATEGORY = Tram body design
+DESC = "Together, We Create a Safe Cyberworld" — tram body design competition.
+LINK =
+COVER =
+IMAGES = safe-cyberworld-tram.jpg

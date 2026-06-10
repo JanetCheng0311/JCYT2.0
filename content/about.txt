@@ -45,6 +45,6 @@ Cantonese (native), English, Mandarin
 # Format:   - title | year | note | link   (leave link empty if none)
 [AWARDS]
 - HKFAA Poster Design Competition | 2024 | 2nd runner-up — 42nd HK Film Awards Student Poster Design Competition. |
-- Graphis New Talent Awards | 2024 | Honorable Mention. | https://www.graphis.com/entry/b035f481-5c1c-443b-9acf-49d831145a6c/
-- IDA — International Design Awards | 2023 | Silver in Print / Posters — collaborated with Korean university students. | https://www.idesignawards.com/inners-old/zoom.php?cid=9-48599-23
+- Graphis New Talent Awards | 2024 | Honorable Mention. | https://graphis.com/entry/b038f481-5c1e-443b-9acf-49d831145a6c
+- IDA — International Design Awards | 2023 | Silver in Print / Posters — collaborated with Korean university students. | https://www.idesignawards.com/winners/zoom.php?eid=9-48599-23
 - D&AD New Blood Awards | 2023 | Took part in the D&AD New Blood brief; pitched the concept with Blender-made visuals. |
