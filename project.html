@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 <title>Project — JCYT</title>
-<link rel="stylesheet" href="assets/style.css?v=6" />
+<link rel="stylesheet" href="assets/style.css?v=7" />
 </head>
 <body class="page-view project-page">
   <canvas id="art" aria-hidden="true"></canvas>
@@ -41,7 +41,7 @@
         <div class="proj-metaline" id="pr-meta"></div>
         <h1 class="proj-title" id="pr-title"></h1>
         <p class="proj-desc" id="pr-desc"></p>
-        <a class="proj-link" id="pr-link" target="_blank" rel="noopener" style="display:none"></a>
+        <div class="proj-links" id="pr-links"></div>
       </div>
       <div class="proj-gallery" id="pr-gallery"></div>
     </div>
@@ -57,12 +57,16 @@
     text.split(/\r?\n/).forEach((raw) => {
       const line = raw.trim();
       if (!line || line.startsWith("#")) return;
-      if (/^\[PROJECT\]/i.test(line)) { push(); cur = { id: "", title: "", year: "", category: "", desc: "", link: "", cover: "", images: [] }; return; }
-      if (!cur) cur = { id: "", title: "", year: "", category: "", desc: "", link: "", cover: "", images: [] };
+      if (/^\[PROJECT\]/i.test(line)) { push(); cur = { id: "", title: "", year: "", category: "", desc: "", link: "", links: [], cover: "", images: [] }; return; }
+      if (!cur) cur = { id: "", title: "", year: "", category: "", desc: "", link: "", links: [], cover: "", images: [] };
       const kv = line.match(/^([A-Z]+)\s*=\s*(.*)$/i);
       if (!kv) return;
       const key = kv[1].toUpperCase(), val = kv[2].trim();
       if (key === "ID") cur.id = val;
+      else if (key === "LINKS") cur.links = val ? val.split(",").map((s) => {
+          const t = s.trim(); const i = t.indexOf("|");
+          return i >= 0 ? { label: t.slice(0, i).trim(), url: t.slice(i + 1).trim() } : { label: "Visit", url: t };
+        }).filter((l) => l.url) : [];
       else if (key === "TITLE") cur.title = val;
       else if (key === "YEAR") cur.year = val;
       else if (key === "CATEGORY") cur.category = val;
@@ -86,10 +90,15 @@
     meta.forEach((m) => { const s = document.createElement("span"); s.textContent = m; mEl.appendChild(s); });
     document.getElementById("pr-title").textContent = p.title || "Untitled";
     document.getElementById("pr-desc").textContent = p.desc || "";
-    if (p.link) {
-      const a = document.getElementById("pr-link");
-      a.href = p.link; a.textContent = "Visit ↗"; a.style.display = "";
-    }
+    const links = (p.links || []).slice();
+    if (p.link) links.push({ label: "Visit", url: p.link });
+    const lc = document.getElementById("pr-links");
+    links.forEach((l) => {
+      const a = document.createElement("a");
+      a.className = "proj-link"; a.href = l.url; a.target = "_blank"; a.rel = "noopener";
+      a.textContent = (l.label || "Visit") + " ↗";
+      lc.appendChild(a);
+    });
     const g = document.getElementById("pr-gallery");
     if (p.images && p.images.length) {
       p.images.forEach((src, i) => {
