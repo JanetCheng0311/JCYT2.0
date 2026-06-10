@@ -39,6 +39,7 @@
     <div class="page-inner">
       <p class="kicker">About</p>
       <h1 class="page-title" id="ab-name"></h1>
+      <p class="about-fullname" id="ab-fullname"></p>
       <p class="about-tagline" id="ab-tag"></p>
       <div class="about-intro" id="ab-intro"></div>
 
@@ -79,14 +80,14 @@
   <script>
   // Turn the plain-text file into structured data.
   function parseAbout(text) {
-    const out = { name: "", role: "", location: "", intro: [], education: [], experience: [], tools: [], languages: [], awards: [] };
+    const out = { name: "", fullname: "", role: "", location: "", intro: [], education: [], experience: [], tools: [], languages: [], awards: [] };
     let section = "";
     text.split(/\r?\n/).forEach((raw) => {
       const line = raw.trim();
       if (!line || line.startsWith("#")) return;            // blank or comment
       const sec = line.match(/^\[(.+?)\]/);
       if (sec) { section = sec[1].trim().toUpperCase(); return; }
-      const kv = line.match(/^(NAME|ROLE|LOCATION)\s*=\s*(.*)$/i);
+      const kv = line.match(/^(NAME|FULLNAME|ROLE|LOCATION)\s*=\s*(.*)$/i);
       if (kv) { out[kv[1].toLowerCase()] = kv[2].trim(); return; }
       const isItem = line.startsWith("- ");
       const body = isItem ? line.slice(2).trim() : line;
@@ -108,6 +109,9 @@
     const byId = (id) => document.getElementById(id);
 
     byId("ab-name").textContent = ABOUT.name || "JCYT";
+    const fn = byId("ab-fullname");
+    if (ABOUT.fullname) { fn.textContent = ABOUT.fullname; fn.style.display = ""; }
+    else { fn.textContent = ""; fn.style.display = "none"; }
     byId("ab-tag").textContent = [ABOUT.role, ABOUT.location].filter(Boolean).join("  ·  ");
 
     const intro = byId("ab-intro"); intro.innerHTML = "";

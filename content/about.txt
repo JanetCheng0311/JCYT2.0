@@ -12,7 +12,8 @@
 #  - Keep the bars | in place, even if a field is empty.
 # ============================================================
 
-NAME = Janet Cheng
+NAME = Janet
+FULLNAME = Cheng Yu Tung
 ROLE = Multimedia designer & creative technologist
 LOCATION = Hong Kong
 
