@@ -53,6 +53,34 @@ body.page-view::before {
 .scrim-top { top: 0; height: 140px; background: linear-gradient(to bottom, color-mix(in srgb, var(--bg) 80%, #000 8%), transparent); }
 .scrim-bottom { bottom: 0; height: 170px; background: linear-gradient(to top, color-mix(in srgb, var(--bg) 80%, #000 8%), transparent); }
 
+/* ---- Home hint (guides to the menu) ---- */
+.home-hint {
+  position: fixed; z-index: 20; left: 50%; top: 47%; transform: translate(-50%, -50%);
+  display: flex; flex-direction: column; align-items: center; gap: 16px;
+  text-align: center; padding: 30px; max-width: 92vw; pointer-events: none;
+}
+.home-hint::before {
+  content: ""; position: absolute; inset: -40% -30%; z-index: -1; pointer-events: none;
+  background: radial-gradient(55% 55% at 50% 50%, color-mix(in srgb, var(--bg) 72%, #000 10%), transparent 72%);
+}
+.hh-line { font-family: var(--font-mono); font-size: clamp(12px, 1.6vw, 14px); letter-spacing: .14em; text-transform: uppercase; opacity: .8; }
+.hh-cta {
+  pointer-events: auto; cursor: pointer;
+  font-family: var(--font-mono); font-size: clamp(13px, 1.7vw, 15px); color: var(--fg);
+  padding: 12px 22px; border-radius: 999px; white-space: nowrap;
+  background: color-mix(in srgb, var(--bg) 55%, #000 16%);
+  border: 1px solid color-mix(in srgb, var(--fg) 32%, transparent);
+  backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+  transition: transform .15s ease, background .2s ease, border-color .2s ease;
+}
+.hh-cta:hover { transform: translateY(-2px); background: color-mix(in srgb, var(--bg) 42%, #000 18%); border-color: color-mix(in srgb, var(--fg) 50%, transparent); }
+.hh-arrow { display: inline-block; animation: hhBounce 1.6s ease-in-out infinite; }
+@keyframes hhBounce { 0%, 100% { transform: translate(0, 0); } 50% { transform: translate(2px, -2px); } }
+.menu-btn.hintpulse { animation: menuPulse 1.4s ease-in-out 3; }
+@keyframes menuPulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.14); } }
+@media (max-width: 480px) { .home-hint { top: 44%; } }
+@media (prefers-reduced-motion: reduce) { .hh-arrow, .menu-btn.hintpulse { animation: none; } }
+
 /* ---- Top bar: logo (left) + menu (right) ---- */
 .topbar {
   position: fixed; top: 0; left: 0; right: 0; z-index: 30;

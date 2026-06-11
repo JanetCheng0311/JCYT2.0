@@ -254,6 +254,14 @@ if (menuBtn && overlay) {
     setMenu(false);
   });
   document.addEventListener("keydown", (e) => { if (e.key === "Escape") setMenu(false); });
+
+// home hint: the CTA opens the menu; the menu button pulses briefly on first load
+const homeCta = document.getElementById("homeCta");
+if (homeCta && menuBtn) homeCta.addEventListener("click", () => setMenu(true));
+if (homeCta && menuBtn && !REDUCED) {
+  menuBtn.classList.add("hintpulse");
+  setTimeout(() => menuBtn.classList.remove("hintpulse"), 4500);
+}
 }
 
 /* ---------- Boot ---------- */
