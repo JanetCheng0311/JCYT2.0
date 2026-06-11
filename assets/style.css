@@ -462,8 +462,9 @@ body.page-view::before {
   transition: transform .15s ease, background .25s ease;
 }
 .proj-link:hover { transform: translateY(-1px); background: linear-gradient(135deg, rgba(255,255,255,.2), rgba(255,255,255,.07)); }
-.proj-gallery { display: flex; flex-direction: column; gap: clamp(14px, 2.5vw, 28px); }
-.proj-gallery img { width: 100%; height: auto; display: block; border-radius: 12px; background: color-mix(in srgb, var(--bg) 80%, #000 6%); }
+.proj-gallery { display: flex; flex-direction: column; align-items: center; gap: clamp(14px, 2.5vw, 28px); }
+/* cap gallery width below the images' native size so they stay sharp (no upscaling) */
+.proj-gallery img { width: auto; max-width: min(100%, 860px); height: auto; display: block; border-radius: 12px; background: color-mix(in srgb, var(--bg) 80%, #000 6%); }
 .proj-empty { font-family: var(--font-mono); opacity: .7; line-height: 1.6; }
 
 @media (max-width: 760px) { .about-grid { grid-template-columns: 1fr; } }

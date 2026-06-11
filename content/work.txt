@@ -33,7 +33,7 @@ YEAR = 2025
 CATEGORY = Capstone · Branding
 DESC = Promoting Chinese graphology in Hong Kong — identity, system and introduction video.
 LINKS = Behance|https://www.behance.net/gallery/226548257/GRAFRI-
-COVER = grafri/06.jpg
+COVER = grafri/logo.png
 IMAGES = grafri/01.jpg, grafri/02.jpg, grafri/03.jpg, grafri/04.jpg, grafri/05.jpg, grafri/06.jpg, grafri/07.jpg, grafri/08.jpg, grafri/09.jpg, grafri/10.jpg, grafri/11.jpg, grafri/12.jpg, grafri/13.jpg, grafri/14.jpg, grafri/15.jpg, grafri/16.jpg, grafri/17.jpg, grafri/18.jpg, grafri/19.jpg, grafri/20.jpg, grafri/21.jpg, grafri/22.jpg, grafri/23.jpg, grafri/24.jpg, grafri/25.jpg, grafri/26.jpg, grafri/27.jpg, grafri/28.jpg, grafri/29.jpg, grafri/30.jpg, grafri/31.jpg, grafri/32.jpg, grafri/33.jpg, grafri/34.jpg, grafri/35.jpg, grafri/36.jpg, grafri/37.jpg, grafri/38.jpg, grafri/39.jpg, grafri/40.jpg
 
 [PROJECT]
@@ -89,7 +89,7 @@ IMAGES = crystal-type/01.jpg, crystal-type/02.jpg, crystal-type/03.jpg, crystal-
 [PROJECT]
 ID = our-hour
 TITLE = 24/7 — Our Hour
-YEAR = 2023
+YEAR = 2024
 CATEGORY = Poster / Print
 DESC = Silver, IDA New Graphic Design Award (with Korean university students); Honorable Mention, Graphis New Talent.
 LINKS = IDA|https://www.idesignawards.com/winners/zoom.php?eid=9-48599-23, Graphis|https://graphis.com/entry/b038f481-5c1e-443b-9acf-49d831145a6c
@@ -120,7 +120,7 @@ IMAGES = geometric/01.jpg, geometric/02.jpg, geometric/03.jpg
 [PROJECT]
 ID = long-ear-monster
 TITLE = Long Ear Monster
-YEAR = 2022
+YEAR = 2021
 CATEGORY = Character / Toy design
 DESC = Character design and a handmade comfort soft toy.
 LINK =
