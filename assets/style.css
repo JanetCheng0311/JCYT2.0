@@ -55,13 +55,13 @@ body.page-view::before {
 
 /* ---- Home hint (guides to the menu) ---- */
 .home-hint {
-  position: fixed; z-index: 20; left: 50%; top: 47%; transform: translate(-50%, -50%);
-  display: flex; flex-direction: column; align-items: center; gap: 16px;
-  text-align: center; padding: 30px; max-width: 92vw; pointer-events: none;
+  position: fixed; z-index: 20; left: var(--pad); top: clamp(58px, 8.5vh, 88px); transform: none;
+  display: flex; flex-direction: column; align-items: flex-start; gap: 14px;
+  text-align: left; padding: 0; max-width: min(62vw, 360px); pointer-events: none;
 }
 .home-hint::before {
-  content: ""; position: absolute; inset: -40% -30%; z-index: -1; pointer-events: none;
-  background: radial-gradient(55% 55% at 50% 50%, color-mix(in srgb, var(--bg) 72%, #000 10%), transparent 72%);
+  content: ""; position: absolute; inset: -14px -20px; z-index: -1; pointer-events: none;
+  background: radial-gradient(72% 72% at 20% 28%, color-mix(in srgb, var(--bg) 70%, #000 10%), transparent 78%);
 }
 .hh-line { font-family: var(--font-mono); font-size: clamp(12px, 1.6vw, 14px); letter-spacing: .14em; text-transform: uppercase; opacity: .8; }
 .hh-cta {
@@ -78,7 +78,7 @@ body.page-view::before {
 @keyframes hhBounce { 0%, 100% { transform: translate(0, 0); } 50% { transform: translate(2px, -2px); } }
 .menu-btn.hintpulse { animation: menuPulse 1.4s ease-in-out 3; }
 @keyframes menuPulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.14); } }
-@media (max-width: 480px) { .home-hint { top: 44%; } }
+@media (max-width: 480px) { .home-hint { top: clamp(52px, 7.5vh, 72px); max-width: 80vw; } }
 @media (prefers-reduced-motion: reduce) { .hh-arrow, .menu-btn.hintpulse { animation: none; } }
 
 /* ---- Top bar: logo (left) + menu (right) ---- */

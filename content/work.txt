@@ -55,8 +55,8 @@ YEAR = 2025
 CATEGORY = Game prototype · Unreal Engine
 DESC = Cozy collection game prototype (Hamster Autumn Meadow Uproll).
 PAGE = hamu.html
-COVER = hamu/title.jpg
-IMAGES = hamu/title.jpg
+COVER = hamu/main.png
+IMAGES = hamu/main.png
 
 [PROJECT]
 ID = grafri
