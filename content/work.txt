@@ -29,6 +29,16 @@
 # ============================================================
 
 [PROJECT]
+ID = transmission-lost
+TITLE = Hello? Transmission Lost
+YEAR = 2026
+CATEGORY = Narrative puzzle horror game · Team Looooop
+DESC = Final-year group project — a horror game about AI prediction and control.
+PAGE = transmission-lost.html
+COVER = transmission/cover.jpg
+IMAGES = transmission/cover.jpg
+
+[PROJECT]
 ID = valkyrie-skuld
 TITLE = VALKYRIE-SKULD
 YEAR = 2026
