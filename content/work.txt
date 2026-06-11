@@ -34,7 +34,7 @@ CATEGORY = Capstone · Branding
 DESC = Promoting Chinese graphology in Hong Kong — identity, system and introduction video.
 LINKS = Behance|https://www.behance.net/gallery/226548257/GRAFRI-
 COVER = grafri/logo.png
-IMAGES = grafri/01.jpg, grafri/02.jpg, grafri/03.jpg, grafri/04.jpg, grafri/05.jpg, grafri/06.jpg, grafri/07.jpg, grafri/08.jpg, grafri/09.jpg, grafri/10.jpg, grafri/11.jpg, grafri/12.jpg, grafri/13.jpg, grafri/14.jpg, grafri/15.jpg, grafri/16.jpg, grafri/17.jpg, grafri/18.jpg, grafri/19.jpg, grafri/20.jpg, grafri/21.jpg, grafri/22.jpg, grafri/23.jpg, grafri/24.jpg, grafri/25.jpg, grafri/26.jpg, grafri/27.jpg, grafri/28.jpg, grafri/29.jpg, grafri/30.jpg, grafri/31.jpg, grafri/32.jpg, grafri/33.jpg, grafri/34.jpg, grafri/35.jpg, grafri/36.jpg, grafri/37.jpg, grafri/38.jpg, grafri/39.jpg, grafri/40.jpg
+IMAGES = grafri/01.jpg, grafri/02.jpg, grafri/03.jpg, grafri/04.jpg, grafri/05.jpg, grafri/06.jpg, grafri/07.jpg, grafri/08.jpg, grafri/09.jpg, grafri/10.jpg, grafri/11.jpg, grafri/12.jpg, grafri/13.jpg, grafri/14.jpg, grafri/15.jpg, grafri/16.jpg, grafri/17.jpg, grafri/18.jpg, grafri/19.jpg, grafri/20.jpg, grafri/21.jpg, grafri/22.jpg, grafri/23.jpg, grafri/24.jpg, grafri/25.jpg, grafri/26.jpg, grafri/27.jpg, grafri/28.jpg, grafri/29.jpg, grafri/30.jpg, grafri/31.jpg, grafri/32.jpg, grafri/33.jpg, grafri/34.jpg, grafri/35.jpg, grafri/36.jpg, grafri/37.jpg
 
 [PROJECT]
 ID = eternal-moment
