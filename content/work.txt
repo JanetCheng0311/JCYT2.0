@@ -35,8 +35,8 @@ YEAR = 2026
 CATEGORY = 3D Character · Real-time
 DESC = Original sci-fi robot character — concept to final video.
 PAGE = valkyrie-skuld.html
-COVER = valkyrie-skuld.jpg
-IMAGES = valkyrie-skuld.jpg
+COVER = valkyrie/front.jpg
+IMAGES = valkyrie/front.jpg
 
 [PROJECT]
 ID = hamu
@@ -45,8 +45,8 @@ YEAR = 2025
 CATEGORY = Game prototype · Unreal Engine
 DESC = Cozy collection game prototype (Hamster Autumn Meadow Uproll).
 PAGE = hamu.html
-COVER = hamu.jpg
-IMAGES = hamu.jpg
+COVER = hamu/title.jpg
+IMAGES = hamu/title.jpg
 
 [PROJECT]
 ID = grafri

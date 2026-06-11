@@ -496,6 +496,11 @@ body.page-view::before {
 .proj-section ul { list-style: none; display: flex; flex-direction: column; gap: 9px; }
 .proj-section li { position: relative; padding-left: 20px; font-size: clamp(15px, 2vw, 17px); line-height: 1.5; opacity: .86; }
 .proj-section li::before { content: "—"; position: absolute; left: 0; opacity: .45; }
+.proj-fig { margin-top: 18px; }
+.proj-fig img { width: 100%; height: auto; max-height: 80vh; object-fit: contain; display: block; border-radius: 12px; background: color-mix(in srgb, var(--bg) 80%, #000 6%); }
+.proj-fig.plain img { background: none; }
+.proj-figrow { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 18px; }
+.proj-figrow .proj-fig { flex: 1 1 280px; margin-top: 0; }
 
 .proj-gallery { display: flex; flex-direction: column; align-items: center; gap: clamp(14px, 2.5vw, 28px); }
 /* fit every image fully on screen: cap by width AND viewport height */
