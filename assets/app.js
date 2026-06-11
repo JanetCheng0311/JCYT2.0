@@ -217,6 +217,26 @@ if (autoBtnEl) autoBtnEl.addEventListener("click", () => {
 });
 if (canvas) canvas.addEventListener("dblclick", reseed);
 
+/* ---------- Smooth page-to-page transitions ---------- */
+const REDUCED = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+function smoothGo(href) {
+  if (REDUCED || document.body.classList.contains("leaving")) { location.href = href; return; }
+  document.body.classList.add("leaving");
+  setTimeout(() => { location.href = href; }, 190);
+}
+// fade out on any internal link (menu, back links, footer page links)
+document.addEventListener("click", (e) => {
+  const a = e.target.closest("a");
+  if (!a) return;
+  const href = a.getAttribute("href");
+  if (!href || a.target === "_blank" || a.getAttribute("aria-disabled") === "true") return;
+  if (href.startsWith("#") || href.startsWith("mailto:") || /^https?:/i.test(href)) return;
+  e.preventDefault();
+  smoothGo(href);
+}, true);
+// coming back via the browser cache: make sure the page isn't stuck faded out
+window.addEventListener("pageshow", () => document.body.classList.remove("leaving"));
+
 /* ---------- Menu overlay ---------- */
 const menuBtn = document.getElementById("menuBtn");
 const overlay = document.getElementById("overlay");

@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 <title>Work — JCYT</title>
-<link rel="stylesheet" href="assets/style.css?v=12" />
+<link rel="stylesheet" href="assets/style.css?v=13" />
 </head>
 <body class="page-view">
   <canvas id="art" aria-hidden="true"></canvas>
@@ -78,8 +78,8 @@
     text.split(/\r?\n/).forEach((raw) => {
       const line = raw.trim();
       if (!line || line.startsWith("#")) return;
-      if (/^\[PROJECT\]/i.test(line)) { push(); cur = { id: "", title: "", year: "", category: "", desc: "", link: "", cover: "", images: [] }; return; }
-      if (!cur) cur = { id: "", title: "", year: "", category: "", desc: "", link: "", cover: "", images: [] };
+      if (/^\[PROJECT\]/i.test(line)) { push(); cur = { id: "", title: "", year: "", category: "", desc: "", link: "", page: "", cover: "", images: [] }; return; }
+      if (!cur) cur = { id: "", title: "", year: "", category: "", desc: "", link: "", page: "", cover: "", images: [] };
       const kv = line.match(/^([A-Z]+)\s*=\s*(.*)$/i);
       if (!kv) return;
       const key = kv[1].toUpperCase(), val = kv[2].trim();
@@ -89,6 +89,7 @@
       else if (key === "CATEGORY") cur.category = val;
       else if (key === "DESC") cur.desc = val;
       else if (key === "LINK") cur.link = val;
+      else if (key === "PAGE") cur.page = val;
       else if (key === "COVER") cur.cover = val;
       else if (key === "IMAGES") cur.images = val ? val.split(",").map((s) => s.trim()).filter(Boolean) : [];
     });
@@ -229,7 +230,8 @@
 
         row.appendChild(thumb); row.appendChild(main); row.appendChild(arrow);
         const pid = p.id || ("p" + p._i);
-        row.addEventListener("click", () => { location.href = "project.html?p=" + encodeURIComponent(pid); });
+        const url = p.page ? p.page : "project.html?p=" + encodeURIComponent(pid);
+        row.addEventListener("click", () => { if (typeof smoothGo === "function") smoothGo(url); else location.href = url; });
         li.appendChild(row);
         ul.appendChild(li);
       });

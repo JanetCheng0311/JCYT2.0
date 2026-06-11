@@ -18,6 +18,8 @@
 #  LINK     = an optional web link (leave empty if none)
 #  LINKS    = one or more buttons. Format:  Label|url, Label|url
 #             e.g.  LINKS = Behance|https://..., Picrew|https://...
+#  PAGE     = optional. If set, clicking this project opens that page file
+#             (e.g. valkyrie-skuld.html) instead of the standard gallery page.
 #  COVER    = the image shown in the Work list (leave empty = first IMAGE)
 #  IMAGES   = all the project's images, comma-separated. They live in
 #             assets/work/  (each project has its own sub-folder).
@@ -25,6 +27,26 @@
 #  >>> Lines marked  "# CHECK"  are projects whose title/year I'm unsure of.
 #      Please fix them, then publish.
 # ============================================================
+
+[PROJECT]
+ID = valkyrie-skuld
+TITLE = VALKYRIE-SKULD
+YEAR = 2026
+CATEGORY = 3D Character · Real-time
+DESC = Original sci-fi robot character — concept to final video.
+PAGE = valkyrie-skuld.html
+COVER = valkyrie-skuld.jpg
+IMAGES = valkyrie-skuld.jpg
+
+[PROJECT]
+ID = hamu
+TITLE = HAMU
+YEAR = 2025
+CATEGORY = Game prototype · Unreal Engine
+DESC = Cozy collection game prototype (Hamster Autumn Meadow Uproll).
+PAGE = hamu.html
+COVER = hamu.jpg
+IMAGES = hamu.jpg
 
 [PROJECT]
 ID = grafri
