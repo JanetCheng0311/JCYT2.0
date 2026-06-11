@@ -35,8 +35,8 @@ YEAR = 2026
 CATEGORY = 3D Character · Real-time
 DESC = Original sci-fi robot character — concept to final video.
 PAGE = valkyrie-skuld.html
-COVER = valkyrie/front.jpg
-IMAGES = valkyrie/front.jpg
+COVER = valkyrie/cover.jpg
+IMAGES = valkyrie/cover.jpg
 
 [PROJECT]
 ID = hamu
