@@ -136,6 +136,7 @@ body.page-view::before {
   letter-spacing: -0.02em;
   opacity: .55; transition: opacity .25s ease, transform .25s ease;
 }
+.overlay nav a[target="_blank"] { font-size: clamp(26px, 6.5vw, 60px); }
 .overlay nav a.current { opacity: 1; }
 .overlay nav a.current .idx { color: var(--accent, #bcd0ff); opacity: 1; }
 .overlay nav a .idx {
